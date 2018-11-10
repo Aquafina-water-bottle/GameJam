@@ -22,20 +22,21 @@ def main():
 
     # creates sprites
     # well = Well()
-    all_buildings, sprite_group = create_buildings()
+    buildings = create_buildings()
 
     # main loop
     while running:
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
-        sprite_group.update()
-        sprite_group.draw(screen)
-        pygame.display.flip()
+        buildings.update()
+        buildings.draw(screen)
 
         # only do something if the event is of type QUIT
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             running = False
+
+        pygame.display.flip()
 
         # list_of_keys = pygame.key.get_pressed()
         # temp gets wsad input
