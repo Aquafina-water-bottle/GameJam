@@ -1,6 +1,5 @@
 # import the pygame module, so you can use it
 import pygame
-import character
 import os
  
 # define a main function
@@ -18,10 +17,10 @@ def main():
     running = True
     character_x = 1920/2
     character_y = 1080/2
+    camera_x = character_x
+    camera_y = character_y
     background = pygame.image.load(os.path.join('background-1.png'))
     background = pygame.transform.scale(background, (840*4, 650*4))
-    background_x = 0
-    background_y = 0
      
     clock = pygame.time.Clock()
 
@@ -35,15 +34,16 @@ def main():
                 running = False
 
         pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_UP]: background_y += 3
-        if pressed[pygame.K_DOWN]: background_y -= 3
-        if pressed[pygame.K_LEFT]: background_x += 3
-        if pressed[pygame.K_RIGHT]: background_x -= 3
+        if pressed[pygame.K_UP]: camera_y += 6
+        if pressed[pygame.K_DOWN]: camera_y -= 6
+        if pressed[pygame.K_LEFT]: camera_x += 6
+        if pressed[pygame.K_RIGHT]: camera_x -= 6
         
         color = (255, 100, 0)
         screen.fill((0, 0, 0))
-        screen.blit(background, (background_x, background_y))
+        screen.blit(background, (0 + camera_x, 0 + camera_y))
         pygame.draw.rect(screen, color, pygame.Rect(character_x, character_y, 60, 60))
+        pygame.draw.rect(screen, color, pygame.Rect(1000 + camera_x, 500 + camera_y, 60, 60))
         pygame.display.flip()
         clock.tick(60)
      
