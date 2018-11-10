@@ -2,6 +2,8 @@
 import pygame
 import os
 
+from constants import *
+
 # define a main function
 def main():
 
@@ -11,14 +13,18 @@ def main():
     pygame.display.set_caption("Escape The Village")
 
     # create a surface on screen that has the size of 240 x 180
-    screen = pygame.display.set_mode((1920, 1080))
+    # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+    screen = pygame.display.set_mode(SCREEN_SIZE)
 
     # define a variable to control the main loop
     running = True
-    character_x = 1920/2
-    character_y = 1080/2
+    character_x = SCREEN_SIZE[X] // 2 - CHARACTER_SIZE[X] // 2
+    character_y = SCREEN_SIZE[Y] // 2 - CHARACTER_SIZE[Y] // 2
+
+    # temporarily transforms the background to the current resolution
     background = pygame.image.load(os.path.join('background-1.png'))
-    background = pygame.transform.scale(background, (840*4, 650*4))
+    background = pygame.transform.scale(background, MAP_SIZE)
+
     background_x = 0
     background_y = 0
 
@@ -34,6 +40,7 @@ def main():
                 running = False
 
         pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_q]: running = False
         if pressed[pygame.K_UP]: background_y += 3
         if pressed[pygame.K_DOWN]: background_y -= 3
         if pressed[pygame.K_LEFT]: background_x += 3
