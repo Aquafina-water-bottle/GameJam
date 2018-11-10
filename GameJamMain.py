@@ -1,6 +1,5 @@
 # import the pygame module, so you can use it
 import pygame
-import character
 import os
 
 # define a main function
@@ -52,4 +51,4 @@ def main():
 # (if you import this as a module then nothing is executed)
 if __name__=="__main__":
     # call the main function
-main()
+    main()
