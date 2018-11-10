@@ -77,7 +77,7 @@ class IndividualBuilding(pygame.sprite.Sprite):
 
 class Well(Building):
     def __init__(self):
-        super().__init__("well", 100, 60, True)
+        super().__init__("well", 100, 60)
 
 class WatchTower:
     pass
