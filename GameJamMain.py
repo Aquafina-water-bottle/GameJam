@@ -101,9 +101,9 @@ class Game:
         if pressed[pygame.K_RIGHT]:
             self.camera.x -= 6
 
-
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
 if __name__=="__main__":
     # call the main function
     main()
+
