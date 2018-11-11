@@ -24,8 +24,6 @@ TODO (programming):
     - increment points to whatever
 
 - math for collectibles
-
-- fade in
 """
 
 def main():
@@ -51,7 +49,15 @@ class Coords:
 class Character(pygame.Rect):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.weight = 0
         self.points_collected = 0
+
+        # for specific inventory items
+        # TODO uncomment when we're using this
+        #self.has_water_skin = False
+        #self.has_key_a = False
+        #self.has_key_b = False
+
 
     def move_back(self, camera, other, velocity):
         """
@@ -61,8 +67,10 @@ class Character(pygame.Rect):
 
         velocity = tuple of (+/-1, +/-1) to determine which way it's moving
         """
+        # TODO DOESN'T WORK REEE
+        # IDEA: make rect objects of 1 pixel length to represent the top areas and move back accordingly
+        # however, how to do masking then?
 
-        print(velocity)
 
         camera_bottom = camera.y + CHARACTER_SIZE[Y] // 2
         camera_top = camera.y - CHARACTER_SIZE[Y] // 2
@@ -71,12 +79,10 @@ class Character(pygame.Rect):
 
         # when the camera is below the top and it's trying to move down: moves back up
         if velocity[Y] == 1 and other.top < camera_bottom:
-            print("moving down")
             camera.y -= camera_bottom - other.top
 
         # when the camera is above the bottom and it's trying to move up: moves back down
         if velocity[Y] == -1 and other.bottom > camera_top:
-            print("moving up")
             camera.y += other.bottom - camera_top
 
         # when the camera is trying to move to the right: moves back left
@@ -109,19 +115,25 @@ class Game:
 
         # specifies the middle of the screen
         self.character = Character(CHARACTER_MIDDLE, CHARACTER_SIZE)
-        # self.character = pygame.Rect(
-        #     SCREEN_SIZE[X] // 2 - CHARACTER_SIZE[X] // 2,
-        #     SCREEN_SIZE[Y] // 2 - CHARACTER_SIZE[Y] // 2,
-        #     60, 60
-        # )
 
-        self.fade_in = True
+        # TODO remove to add fade in
+        #self.fade_in = True
+        self.fade_in = False; self.countdown.start()  # because annoying
+
+        self.clicked_f = False
+        self.holding_f = False
 
         # temporarily transforms the background to the current resolution
         default_background, _ = load_image('background_outline.png')
         self.background = default_background
 
+
+        # variables for when you're in some building
+        self.in_building = False
+        self.current_building = None
+
         self.camera = Coords(*CHARACTER_START)
+
 
     @property
     def background(self):
@@ -138,7 +150,6 @@ class Game:
         while self.running:
             self.handle_event()
             self.draw()
-            print(self.continue_game, self.fade_in)
             if self.continue_game and not self.fade_in:
                 self.update()
 
@@ -167,16 +178,28 @@ class Game:
         if pressed[pygame.K_q]:
             self.running = False
 
+        # so that F can be pressed once and not held down
+        # since when it's held down, clicked_f is set to false
+        if pressed[pygame.K_f]:
+            if not self.holding_f:
+                self.holding_f = True
+                self.clicked_f = True
+            else:
+                self.clicked_f = False
+        else:
+            self.holding_f = self.clicked_f = False
+
+        print(self.holding_f, self.clicked_f)
+
     def draw(self):
         color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
         pygame.draw.rect(self.screen, color, self.character)
-        # pygame.draw.rect(self.screen, color, pygame.Rect(1000 + self.camera.x, 500 + self.camera.y, 60, 60))
-        # pygame.draw.rect(self.screen, color, pygame.Rect(100 + self.camera.x, 100 + self.camera.y, 60, 60))
 
-        # updates all collectibles
-        self.collectibles.update(self.character, self.camera)
+        # updates all collectibles only when "F" is pressed
+        if self.clicked_f:
+            self.collectibles.update(self.character, self.camera)
 
         # NOTE: TEMPORARY!!!
         for building in self.buildings:
@@ -189,7 +212,6 @@ class Game:
 
         if self.fade_in:
             alpha_value = int(255 - 255 * (time.time() - begin_time) / FADE_IN_TIME)
-            print("alpha:", alpha_value)
             black_fade_surface = self.screen.copy()
             black_fade_surface.fill(pygame.Color("black"))
             black_fade_surface.set_alpha(alpha_value)
@@ -216,19 +238,23 @@ class Game:
             self.camera.x += VELOCITY
             velocity[X] += 1
 
-        # checks for the building shit
-        for building in self.buildings:
-            if building.enters(self.character, self.camera):
-                print("colliding with entrance")
-            else:
-                print()
-            # TODO doesn't actually work lmao
-        #     if building.collides(self.character, self.camera):
-        #         # moves back accordingly
-        #         self.character.move_back(self.camera, building.position, tuple(velocity))
+        if not self.in_building:
+            # checks for the building shit
+            for building in self.buildings:
+                pass
+                # if building.enters(self.character, self.camera):
+                #     print("colliding with entrance")
+                # else:
+                #     print()
+                # TODO doesn't actually work lmao
+            #     if building.collides(self.character, self.camera):
+            #         # moves back accordingly
+            #         self.character.move_back(self.camera, building.position, tuple(velocity))
 
+        else:
+            # checks 
+            pass
 
-        # gets character position for the next frame
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)

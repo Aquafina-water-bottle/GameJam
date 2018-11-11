@@ -33,7 +33,7 @@ class Building:
 
 def create_buildings():
     buildings_dict = {
-        "main_house": Building(pygame.Rect(200, 300, 500, 500), pygame.Rect(100, 250, 50, 50), "sample_building.png"),
+        "main_house": Building(pygame.Rect(200, 300, 500, 500), pygame.Rect(250, 450, 50, 50), "sample_building.png"),
     }
     group = SpriteGroup(buildings_dict)
     return group

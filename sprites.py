@@ -109,9 +109,10 @@ class Sprite(pygame.sprite.Sprite):
         screen.blit(self.image, relative_position)
 
 class Collectible(Sprite):
-    def __init__(self, png_name, x, y, point_worth):
+    def __init__(self, png_name, x, y, point_worth, weight):
         super().__init__(png_name, x, y)
         self.point_worth = point_worth
+        self.weight = weight
         self.picked_up = False
 
     def update(self, character, camera):
@@ -124,7 +125,7 @@ class Collectible(Sprite):
 
 def create_collectibles():
     sprite_dict = {
-        "well": Collectible("well_bottom.png", 100, 100, 5),
+        "well": Collectible("well_bottom.png", 100, 100, 5, 5),
     }
 
     group = SpriteGroup(sprite_dict)
