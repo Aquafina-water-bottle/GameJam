@@ -3,12 +3,7 @@ import os
 import pygame
 
 from constants import *
-
-def load_image(name):
-    png_name = os.path.join('assets', name)
-    image = pygame.image.load(png_name)
-    image = image.convert()
-    return image, image.get_rect()
+from general import load_image
 
 
 class SpriteGroup:
@@ -36,63 +31,12 @@ class SpriteGroup:
             sprite.update(*args, **kwargs)
 
 
-# def create_buildings():
-#     buildings = {
-#         "well": Well()
-#     }
-#
-#     return Buildings(buildings)
-#
-# class SpriteGroup:
-#     """
-#     wrapper to just draw and update all buildings at once
-#     """
-#     def __init__(self, buildings_dict):
-#         self._sprite_dict = buildings_dict
-#
-#     def __getitem__(self, key):
-#         return self._sprite_dict[key]
-#
-#     def draw(self, screen):
-#         for building in self._sprite_dict.values():
-#             building.draw(screen)
-#
-#     def update(self, *args, **kwargs):
-#         """
-#         empty, can be changed
-#         """
-#         for building in self._sprite_dict.values():
-#             building.update(*args, **kwargs)
-#
-# class Building:
-#     """
-#     assumes pictures are with format "<building_name>_top.png",
-#     "<building_name>_bottom.png" under assets folder
-#     """
-#     def __init__(self, png_name, x, y, show_bottom=False):
-#         self.background = IndividualBuilding(png_name + "_bottom.png", x, y)
-#         self.show_bottom = show_bottom
-#
-#     def draw(self, screen):
-#         if self.show_bottom:
-#             self.bottom.draw(screen)
-#         else:
-#             self.top.draw(screen)
-#
-#     def update(self, *args, **kwargs):
-#         """
-#         empty, can be changed
-#         """
-#         self.bottom.update(*args, **kwargs)
-#         self.top.update(*args, **kwargs)
-
-
 class Sprite(pygame.sprite.Sprite):
     """
     TODO requires png transparency support for some reason idk
     """
-    def __init__(self, png_name, x, y):
-        self.image, self.rect = load_image(png_name)
+    def __init__(self, png_name, x, y, convert_alpha=False):
+        self.image, self.rect = load_image(png_name, convert_alpha)
         super().__init__()
 
         self.rect.x = x
@@ -108,50 +52,5 @@ class Sprite(pygame.sprite.Sprite):
         relative_position = self.get_relative(camera)
         screen.blit(self.image, relative_position)
 
-class Collectible(Sprite):
-    def __init__(self, png_name, x, y, point_worth, weight):
-        super().__init__(png_name, x, y)
-        self.point_worth = point_worth
-        self.weight = weight
-        self.picked_up = False
 
-    def update(self, character, camera):
-        if not self.picked_up and character.colliderect(self.get_relative(camera)):
-            self.picked_up = True
-
-    def draw(self, screen, camera):
-        if not self.picked_up:
-            super().draw(screen, camera)
-
-def create_collectibles():
-    sprite_dict = {
-        "well": Collectible("well_bottom.png", 100, 100, 5, 5),
-    }
-
-    group = SpriteGroup(sprite_dict)
-    return group
-
-
-
-# class Well(Building):
-#     def __init__(self):
-#         super().__init__("well", 100, 60)
-#
-# class WatchTower:
-#     pass
-#
-# class Butcher:
-#     pass
-#
-# class Weaver:
-#     pass
-#
-# class Baker:
-#     pass
-#
-# class Player:
-#     pass
-#
-# class NeighbourHouse:
-#     pass
 

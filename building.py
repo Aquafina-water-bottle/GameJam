@@ -1,6 +1,8 @@
 import pygame
-from sprites import *
-from general import *
+
+from constants import *
+from sprites import SpriteGroup
+from general import load_image, get_relative
 
 class Building:
     """
@@ -16,10 +18,21 @@ class Building:
         self.background, _ = load_image(background_png_name)
 
     def enters(self, character, camera):
-        return character.colliderect(get_relative(self.entrance, camera))
+        return character.rect.colliderect(get_relative(self.entrance, camera))
 
     def collides(self, character, camera):
-        return character.colliderect(get_relative(self.position, camera))
+        return character.rect.colliderect(get_relative(self.position, camera))
+
+    @property
+    def camera_entrance_outer(self):
+        """
+        gets the camera into the middle of the entrance
+        """
+        pass
+
+    @property
+    def camera_entrance_inner(self):
+        pass
 
     def debug_draw_position(self, screen, camera):
         relative_position = get_relative(self.position, camera)
@@ -36,7 +49,7 @@ def create_buildings():
             position=pygame.Rect(200, 300, 500, 500),
             entrance=pygame.Rect(250, 450, 50, 50),
             exit_area=pygame.Rect(250, 450, 50, 50),
-            background_png_name="sample_building.png"
+            background_png_name="sample_building2.png"
         ),
     }
     group = SpriteGroup(buildings_dict)

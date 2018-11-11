@@ -3,12 +3,14 @@ import os
 import time
 
 import pygame
-from pygame import K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d
 
 from constants import *
-from countdown import *
-from sprites import *
-from building import *
+from countdown import Countdown
+from collectibles import create_collectibles
+from building import create_buildings
+from character import Character
+from general import load_image, scale_surface, Coords
+from user_input import UserInput
 
 begin_time = time.time()
 
@@ -20,77 +22,21 @@ TODO (programming):
         - change background
         - load in collectibles
         - ability to exit building
+    - bitmask
 
 - collectible mechanics:
     - increment points to whatever
 
-- math for collectibles
+- character animations
+
+- win condition
+    - math for collectibles
+    - areas for winning
 """
 
 def main():
     game = Game()
     game.play()
-
-class Coords:
-    """
-    Temporary class to store coordinates
-
-    Should replace this with some character class or rect object or something lmao
-    """
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
-
-    def copy(self):
-        return Coords(self.x, self.y)
-
-    def __repr__(self):
-        return "Coords(x={}, y={})".format(self.x, self.y)
-
-class Character(pygame.Rect):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.weight = 0
-        self.points_collected = 0
-
-        # for specific inventory items
-        # TODO uncomment when we're using this
-        #self.has_water_skin = False
-        #self.has_key_a = False
-        #self.has_key_b = False
-
-
-    def move_back(self, camera, other, velocity):
-        """
-        given this rect collides with other_rect, moves back camera to the correct position
-
-        note that y increases as it goes down
-
-        velocity = tuple of (+/-1, +/-1) to determine which way it's moving
-        """
-        # TODO DOESN'T WORK REEE
-        # IDEA: make rect objects of 1 pixel length to represent the top areas and move back accordingly
-        # however, how to do masking then?
-
-
-        camera_bottom = camera.y + CHARACTER_SIZE[Y] // 2
-        camera_top = camera.y - CHARACTER_SIZE[Y] // 2
-        camera_right = camera.x + CHARACTER_SIZE[Y] // 2
-        camera_left = camera.x - CHARACTER_SIZE[Y] // 2
-
-        # when the camera is below the top and it's trying to move down: moves back up
-        if velocity[Y] == 1 and other.top < camera_bottom:
-            camera.y -= camera_bottom - other.top
-
-        # when the camera is above the bottom and it's trying to move up: moves back down
-        if velocity[Y] == -1 and other.bottom > camera_top:
-            camera.y += other.bottom - camera_top
-
-        # when the camera is trying to move to the right: moves back left
-        # (camera is to the right of the left part of other)
-        # if velocity[X] == 1 and other.left < camera_right:
-        #     print("moving right")
-        #     camera.x -= camera_right - other.left
 
 
 class Game:
@@ -116,43 +62,45 @@ class Game:
         self.buildings = create_buildings()
 
         # specifies the middle of the screen
-        self.character = Character(CHARACTER_MIDDLE, CHARACTER_SIZE)
+        self.character = Character("MC-front.png", 0, 0)
+        self.character.rect.x = SCREEN_SIZE[X]//2 - self.character.rect.width//2
+        self.character.rect.y = SCREEN_SIZE[Y]//2 - self.character.rect.height//2
+
+        self.user_input = UserInput()
 
         # TODO remove to add fade in
         self.fade_in = True
         #self.fade_in = False; self.countdown.start()  # because annoying
 
-        self.clicked_f = False
-        self.holding_f = False
-
         # temporarily transforms the background to the current resolution
-        default_background, _ = load_image('background_outline.png')
-        self.background = default_background
+        self.default_background, _ = load_image('background_outline.png')
+        self.background = self.default_background
 
         # variables for when you're in some building
         self.in_building = False
         self.current_building = None
 
-        self.camera = Coords(*CHARACTER_START)
+        self.camera = Coords(CHARACTER_START[X], CHARACTER_START[Y])
 
+    # @property
+    # def background(self):
+    #     return self._background
 
-    @property
-    def background(self):
-        return self._background
-
-    @background.setter
-    def background(self, background):
-        self._background = pygame.transform.scale(background, MAP_SIZE)
-
+    # @background.setter
+    # def background(self, background):
+    #     self._background = scale_surface(background)
 
     def play(self):
         self.bell.play(6)
         self.march.play()
         while self.running:
+            self.user_input.update()
+            self.countdown.update()
             self.handle_event()
             self.draw()
             if self.continue_game and not self.fade_in:
                 self.update()
+                print(self.camera)
 
             self.clock.tick(60)
 
@@ -175,31 +123,17 @@ class Game:
             # can do stuff here idk
             self.continue_game = False
 
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_q]:
+        if self.user_input.clicked_quit():
             self.running = False
-
-        # so that F can be pressed once and not held down
-        # since when it's held down, clicked_f is set to false
-        if pressed[pygame.K_f]:
-            if not self.holding_f:
-                self.holding_f = True
-                self.clicked_f = True
-            else:
-                self.clicked_f = False
-        else:
-            self.holding_f = self.clicked_f = False
-
-        # print(self.holding_f, self.clicked_f)
 
     def draw(self):
         color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
-        pygame.draw.rect(self.screen, color, self.character)
+        # pygame.draw.rect(self.screen, color, self.character)
 
         # updates all collectibles only when "F" is pressed
-        if self.clicked_f:
+        if self.user_input.clicked_interact():
             self.collectibles.update(self.character, self.camera)
 
         # NOTE: TEMPORARY!!!
@@ -209,9 +143,14 @@ class Game:
         # draws sprites
         self.collectibles.draw(self.screen, self.camera)
 
+        # draws countdown
         self.countdown.draw(self.screen, self.font, self.fade_in)
 
+        # draws character at the last lmao
+        self.character.draw(self.screen)
+
         if self.fade_in:
+            # where alpha_value decreases from 255 to 0
             alpha_value = int(255 - 255 * (time.time() - begin_time) / FADE_IN_TIME)
             black_fade_surface = self.screen.copy()
             black_fade_surface.fill(pygame.Color("black"))
@@ -224,29 +163,17 @@ class Game:
 
     def update(self):
         pressed = pygame.key.get_pressed()
-        velocity = [0, 0]
-        if pressed[K_UP] or pressed[K_w]:
-            self.camera.y -= VELOCITY
-            velocity[Y] -= 1
-        if pressed[K_DOWN] or pressed[K_s]:
-            self.camera.y += VELOCITY
-            velocity[Y] += 1
-
-        if pressed[K_LEFT] or pressed[K_a]:
-            self.camera.x -= VELOCITY
-            velocity[X] -= 1
-        if pressed[K_RIGHT] or pressed[K_d]:
-            self.camera.x += VELOCITY
-            velocity[X] += 1
+        velocity = self.user_input.get_velocity()
+        self.camera += velocity
+        self.character.update(velocity, self.countdown.tick)
 
         if not self.in_building:
             # checks for the building shit
             for building in self.buildings:
-                pass
-                # if building.enters(self.character, self.camera):
-                #     print("colliding with entrance")
-                # else:
-                #     print()
+                if building.enters(self.character, self.camera) and self.user_input.clicked_interact():
+                    self.in_building = True
+                    self.current_building = building
+                    self.background = self.current_building.background
                 # TODO doesn't actually work lmao
             #     if building.collides(self.character, self.camera):
             #         # moves back accordingly

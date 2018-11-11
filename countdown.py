@@ -6,9 +6,23 @@ COUNTDOWN_START = 60
 class Countdown:
     def __init__(self):
         self.beginning_time = 0
+        self.started = False
+        self._tick = 0
 
     def start(self):
+        self.started = True
         self.beginning_time = time.time()
+
+    def update(self):
+        if self.started:
+            self._tick += 1
+
+    @property
+    def tick(self):
+        """
+        tick shouldn't be set m29
+        """
+        return self._tick
 
     def get(self):
         current_time = time.time()
