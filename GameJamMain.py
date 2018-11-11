@@ -169,6 +169,7 @@ class Game:
 
     def update(self):
         velocity = self.user_input.get_velocity()
+        self.camera.store_previous()
         self.camera += velocity
         self.character.update(velocity, self.countdown.tick)
 
@@ -177,6 +178,8 @@ class Game:
         if pixel[3] > ALPHA_THRESHOLD:
             # TODO move back character
             print("COLLIDES")
+            self.camera.x = self.camera.previous_x
+            self.camera.y = self.camera.previous_y
         else:
             print()
 
