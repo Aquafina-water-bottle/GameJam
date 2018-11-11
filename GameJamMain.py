@@ -3,7 +3,7 @@ import os
 import time
 
 import pygame
-from win import win
+from win import Win
 from constants import *
 from countdown import Countdown
 from collectibles import create_collectibles
@@ -56,12 +56,15 @@ class Game:
         self.ambient = pygame.mixer.Sound("assets/ambient.wav")
         self.clock = pygame.time.Clock()
         self.countdown = Countdown()
-        self.win1 = win(200 * SCALE, 280 * SCALE, 40 * SCALE, 20 * SCALE)
-        self.win2 = win(400 * SCALE, 200 * SCALE, 60 * SCALE, 40 * SCALE)
-        self.win3 = win(610 * SCALE, 330 * SCALE, 60 * SCALE, 20 * SCALE)
+        self.wins = []
+        self.wins.append(Win(200 * SCALE, 280 * SCALE, 40 * SCALE, 20 * SCALE))
+        self.wins.append(Win(400 * SCALE, 200 * SCALE, 60 * SCALE, 40 * SCALE))
+        self.wins.append(Win(610 * SCALE, 330 * SCALE, 60 * SCALE, 20 * SCALE))
+
         self.collectibles = create_collectibles()
         self.buildings = create_buildings()
-        self.end = False
+        self.ended = False
+        self.fade_out_begin = -1
 
         # specifies the middle of the screen
         self.character = Character("MC-front.png", 0, 0)
@@ -72,20 +75,21 @@ class Game:
 
         # TODO remove to add fade in
         self.fade_in = True
+        self.fade_out = False
         #self.fade_in = False; self.countdown.start()  # because annoying
 
         # temporarily transforms the background to the current resolution
         self.default_background = load_image('BACKROUND.png', return_rect=False)
 
-        self.building_wall_mask = load_image('background_outline2.png', convert_alpha=True, return_rect=False)
+        self.building_wall_mask = load_image('background_outline3.png', convert_alpha=True, return_rect=False)
         # self.building_wall_mask = pygame.mask.from_surface(walls)
 
         # character mask is a literal constant one pixel at the base of the
         # self.character_mask = "deeznuts"
 
         # NOTE debugging purposes until mask is properly resized
-        #self.background = self.default_background
-        self.background = self.building_wall_mask
+        self.background = self.default_background
+        #self.background = self.building_wall_mask
 
         # variables for when you're in some building
         self.in_building = False
@@ -102,24 +106,31 @@ class Game:
     #     self._background = scale_surface(background)
 
     def play(self):
-        while self.running:
+        while self.running and not self.ended:
             self.user_input.update()
             self.countdown.update()
             self.handle_event()
             self.draw()
-            if self.end:
-                self.ended()
+
             if self.continue_game and not self.fade_in:
                 self.update()
 
             self.clock.tick(60)
 
+        if self.ended:
+            self.end()
+
     def handle_event(self):
-        # checks if fading has ended
+        # checks if fading has end
         if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
             self.fade_in = False
             self.countdown.start()
             self.ambient.play()
+
+        if self.fade_out and time.time() - self.fade_out_begin > FADE_OUT_TIME:
+            # self.fade_out = False
+            self.ended = True
+
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
         # only do something if the event is of type QUIT
@@ -151,6 +162,10 @@ class Game:
         # draws sprites
         self.collectibles.draw(self.screen, self.camera)
 
+        # draws debug
+        for win in self.wins:
+            win.debug_draw(self.camera, self.screen)
+
         # draws countdown
         self.countdown.draw(self.screen, self.font, self.fade_in)
 
@@ -164,6 +179,15 @@ class Game:
             black_fade_surface.fill(pygame.Color("black"))
             black_fade_surface.set_alpha(alpha_value)
             self.screen.blit(black_fade_surface, (0, 0))
+
+        if self.fade_out:
+            # where alpha_value increases from 0 to 255
+            alpha_value = int(255 * (time.time() - self.fade_out_begin) / FADE_OUT_TIME)
+            black_fade_surface = self.screen.copy()
+            black_fade_surface.fill(pygame.Color("black"))
+            black_fade_surface.set_alpha(alpha_value)
+            self.screen.blit(black_fade_surface, (0, 0))
+
         pygame.display.flip()
 
 
@@ -187,20 +211,21 @@ class Game:
                     self.in_building = True
                     self.current_building = building
                     self.background = self.current_building.background
-                # TODO doesn't actually work lmao
-                if self.win1.collide(self.camera, self.character):
-                    self.end = True
+
+                # collides with any win
+                for win in self.wins:
+                    if win.collide(self.camera, self.character):
+                        self.continue_game = False
+                        self.fade_out = True
+                        self.fade_out_begin = time.time()
+                        self.countdown.stop()
         else:
             # checks whether they have left the building
             pass
 
-    def ended(self):
-        # where alpha_value increases from 0 to 255
-        alpha_value = int(255 * (time.time() - begin_time) / FADE_OUT_TIME)
-        black_fade_surface = self.screen.copy()
-        black_fade_surface.fill(pygame.Color("black"))
-        black_fade_surface.set_alpha(alpha_value)
-        self.continue_game = False
+    def end(self):
+        print("DEEZ NUTS")
+
 
 
 # run the main function only if this module is executed as the main script

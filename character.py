@@ -1,6 +1,5 @@
 import pygame
 
-from typing import NamedTuple
 from sprites import Sprite
 from general import load_image, get_relative, Coords
 from constants import *

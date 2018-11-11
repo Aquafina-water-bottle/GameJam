@@ -7,11 +7,17 @@ class Countdown:
     def __init__(self):
         self.beginning_time = 0
         self.started = False
+        self.stopped = False
+        self.storage = -1
         self._tick = 0
 
     def start(self):
         self.started = True
         self.beginning_time = time.time()
+
+    def stop(self):
+        self.storage = self.get()
+        self.stopped = True
 
     def update(self):
         if self.started:
@@ -25,6 +31,8 @@ class Countdown:
         return self._tick
 
     def get(self):
+        if self.stopped:
+            return self.storage
         current_time = time.time()
         countdown = COUNTDOWN_START - (current_time - self.beginning_time)
         return countdown
@@ -40,7 +48,7 @@ class Countdown:
             countdown = int(self.get()) + 1
 
         rendered_line = str(countdown)
-        text_render = font.render(rendered_line, True, pygame.Color("white"))
+        text_render = font.render(rendered_line, True, pygame.Color("black"))
         text_pos = text_render.get_rect()
         text_pos.topright = screen.get_rect().topright
         screen.blit(text_render, text_pos)
