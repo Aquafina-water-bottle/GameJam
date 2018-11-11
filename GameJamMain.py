@@ -6,6 +6,22 @@ from constants import *
 from countdown import *
 from sprites import *
 
+
+"""
+TODO (programming):
+
+- building mechanics:
+    - enter buildings:
+        - change background
+        - load in collectibles
+        - ability to exit building
+
+- collectible mechanics:
+    - increment points to whatever
+
+- math for collectibles
+"""
+
 def main():
     game = Game()
     game.play()
@@ -24,7 +40,14 @@ class Coords:
         return Coords(self.x, self.y)
 
     def __repr__(self):
-        return f"Coords(x={self.x}, y={self.y})"
+        return "Coords(x={}, y={})".format(self.x, self.y)
+
+class Character(pygame.Rect):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.points_collected = 0
+
+
 
 class Game:
     def __init__(self):
@@ -45,18 +68,28 @@ class Game:
 
         self.collectibles = self.create_collectibles()
 
-        # specifies the top left corner of the character
-        self.character = pygame.Rect(
-            SCREEN_SIZE[X] // 2 - CHARACTER_SIZE[X] // 2,
-            SCREEN_SIZE[Y] // 2 - CHARACTER_SIZE[Y] // 2,
-            60, 60
-        )
+        # specifies the middle of the screen
+        self.character = Character(CHARACTER_MIDDLE, CHARACTER_SIZE)
+        # self.character = pygame.Rect(
+        #     SCREEN_SIZE[X] // 2 - CHARACTER_SIZE[X] // 2,
+        #     SCREEN_SIZE[Y] // 2 - CHARACTER_SIZE[Y] // 2,
+        #     60, 60
+        # )
 
         # temporarily transforms the background to the current resolution
-        self.background = pygame.image.load(os.path.join('background-1.png'))
-        self.background = pygame.transform.scale(self.background, MAP_SIZE)
+        default_background = pygame.image.load(os.path.join('background-1.png'))
+        self.background = default_background
 
-        self.camera = Coords(self.character.x, self.character.y)
+        self.camera = Coords(*CHARACTER_START)
+
+    @property
+    def background(self):
+        return self._background
+
+    @background.setter
+    def background(self, background):
+        self._background = pygame.transform.scale(background, MAP_SIZE)
+
 
     def create_collectibles(self):
         well = Collectible("well_bottom.png", 50, 100, 5)
@@ -70,13 +103,12 @@ class Game:
 
     def play(self):
         while self.running:
-            # play frame
             self.handle_event()
             self.draw()
+            print(self.camera)
             if self.continue_game:
                 self.update()
 
-            # sets the time in velocity
             self.clock.tick(60)
 
     def handle_event(self):
@@ -100,9 +132,10 @@ class Game:
     def draw(self):
         color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
-        self.screen.blit(self.background, (self.camera.x, self.camera.y))
+        self.screen.blit(self.background, (self.camera.x + SCREEN_SIZE[X] // 2, self.camera.y + SCREEN_SIZE[Y] // 2))
         pygame.draw.rect(self.screen, color, self.character)
-        pygame.draw.rect(self.screen, color, pygame.Rect(1000 + self.camera.x, 500 + self.camera.y, 60, 60))
+        # pygame.draw.rect(self.screen, color, pygame.Rect(1000 + self.camera.x, 500 + self.camera.y, 60, 60))
+        # pygame.draw.rect(self.screen, color, pygame.Rect(100 + self.camera.x, 100 + self.camera.y, 60, 60))
 
         # updates all collectibles
         self.collectibles.update(self.character, self.camera)
@@ -116,14 +149,14 @@ class Game:
     def update(self):
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_UP]:
-            self.camera.y += 6
+            self.camera.y += VELOCITY
         if pressed[pygame.K_DOWN]:
-            self.camera.y -= 6
+            self.camera.y -= VELOCITY
 
         if pressed[pygame.K_LEFT]:
-            self.camera.x += 6
+            self.camera.x += VELOCITY
         if pressed[pygame.K_RIGHT]:
-            self.camera.x -= 6
+            self.camera.x -= VELOCITY
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
