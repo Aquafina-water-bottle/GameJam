@@ -30,6 +30,17 @@ class SpriteGroup:
         for sprite in self._sprite_dict.values():
             sprite.update(*args, **kwargs)
 
+
+class Building:
+    """
+    rect for collision, entrance
+    image for background
+    """
+    def __init__(self, dimension_rect, entrance_rect, png_name):
+        self.dimension_rect = dimension_rect
+        self.entrance_rect = entrance_rect
+        self.image, _ = load_image(png_name)
+
 # def create_buildings():
 #     buildings = {
 #         "well": Well()
