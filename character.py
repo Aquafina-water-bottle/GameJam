@@ -99,8 +99,10 @@ class Character(Sprite):
 
         # prerenders all images
         self.images = {
-            "standing-face-down": PoseImages("MC-front.png"),
-            "standing-face-up": PoseImages("MC-Back.png"),
+            "standing-face-down-right": PoseImages("MC-front.png", flip=True),
+            "standing-face-up-right": PoseImages("MC-Back.png", flip=True),
+            "standing-face-down-left": PoseImages("MC-front.png"),
+            "standing-face-up-left": PoseImages("MC-Back.png"),
 
             "moving-up-right": PoseImages("MC-front-Lup.png", "MC-front-Rup.png", flip=True),
             "moving-up": PoseImages("MC-front-for-Lup.png", "MC-front-for-Rup.png"),
@@ -158,32 +160,30 @@ class Character(Sprite):
     def update_walk_pose(self):
         if self.pose.standing:
             if self.pose.facing_up:
-                image_pose = self.images["standing-face-up"]
-                asdf = "standing-face-up"
+                if self.pose.facing_right:
+                    image_pose = self.images["standing-face-up-right"]
+                else:
+                    image_pose = self.images["standing-face-up-left"]
             else:
-                image_pose = self.images["standing-face-down"]
-                asdf = "standing-face-down"
+                if self.pose.facing_right:
+                    image_pose = self.images["standing-face-down-right"]
+                else:
+                    image_pose = self.images["standing-face-down-left"]
         else:
             if self.pose.facing_down:
                 if self.pose.facing_left:
                     image_pose = self.images["moving-up-left"]
-                    asdf = "moving-up-left"
                 elif self.pose.facing_not_right_left:
                     image_pose = self.images["moving-up"]
-                    asdf = "moving-up"
                 else:
                     image_pose = self.images["moving-up-right"]
-                    asdf = "moving-up-right"
             else:
                 if self.pose.facing_left:
                     image_pose = self.images["moving-down-left"]
-                    asdf = "moving-down-right"
                 elif self.pose.facing_not_right_left:
                     image_pose = self.images["moving-down"]
-                    asdf = "moving-down"
                 else:
                     image_pose = self.images["moving-down-right"]
-                    asdf = "moving-down-right"
         self.image = image_pose[self.pose.animation_index]
 
     def draw(self, screen):
