@@ -3,6 +3,7 @@ import os
 import time
 
 import pygame
+from pygame import K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d
 
 from constants import *
 from countdown import *
@@ -205,7 +206,7 @@ class Game:
 
         # NOTE: TEMPORARY!!!
         for building in self.buildings:
-            building._draw(self.screen, self.camera)
+            building.debug_draw_position(self.screen, self.camera)
 
         # draws sprites
         self.collectibles.draw(self.screen, self.camera)
@@ -226,17 +227,17 @@ class Game:
     def update(self):
         pressed = pygame.key.get_pressed()
         velocity = [0, 0]
-        if pressed[pygame.K_UP]:
+        if pressed[K_UP] or pressed[K_w]:
             self.camera.y -= VELOCITY
             velocity[Y] -= 1
-        if pressed[pygame.K_DOWN]:
+        if pressed[K_DOWN] or pressed[K_s]:
             self.camera.y += VELOCITY
             velocity[Y] += 1
 
-        if pressed[pygame.K_LEFT]:
+        if pressed[K_LEFT] or pressed[K_a]:
             self.camera.x -= VELOCITY
             velocity[X] -= 1
-        if pressed[pygame.K_RIGHT]:
+        if pressed[K_RIGHT] or pressed[K_d]:
             self.camera.x += VELOCITY
             velocity[X] += 1
 
@@ -254,13 +255,13 @@ class Game:
             #         self.character.move_back(self.camera, building.position, tuple(velocity))
 
         else:
-            # checks 
+            # checks whether they have left the building
             pass
 
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
-if __name__=="__main__":
+if __name__ == "__main__":
     # call the main function
     main()
 
