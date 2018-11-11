@@ -119,16 +119,21 @@ class Game:
         self.character = Character(CHARACTER_MIDDLE, CHARACTER_SIZE)
 
         # TODO remove to add fade in
-        #self.fade_in = True
-        self.fade_in = False; self.countdown.start()  # because annoying
+        self.fade_in = True
+        #self.fade_in = False; self.countdown.start()  # because annoying
 
         self.clicked_f = False
         self.holding_f = False
 
         # temporarily transforms the background to the current resolution
+<<<<<<< HEAD
+        self.background = pygame.image.load(os.path.join('assets/BAK.png'))
+        self.background = pygame.transform.scale(self.background, MAP_SIZE)
+=======
         default_background, _ = load_image('background_outline.png')
         self.background = default_background
 
+>>>>>>> test
 
         # variables for when you're in some building
         self.in_building = False
@@ -147,9 +152,15 @@ class Game:
 
 
     def play(self):
-        self.bell.play(6)
-        self.bell.play(5)
+<<<<<<< HEAD
+        self.bell.play(8)
         self.march.play()
+        time.sleep(2.2)
+        self.bell.play(7)
+=======
+        self.bell.play(6)
+        self.march.play()
+>>>>>>> test
         while self.running:
             self.handle_event()
             self.draw()
@@ -163,7 +174,7 @@ class Game:
         if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
             self.fade_in = False
             self.countdown.start()
-
+            self.bell.play(5)
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
         # only do something if the event is of type QUIT
