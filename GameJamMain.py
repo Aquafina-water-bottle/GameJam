@@ -126,14 +126,8 @@ class Game:
         self.holding_f = False
 
         # temporarily transforms the background to the current resolution
-<<<<<<< HEAD
-        self.background = pygame.image.load(os.path.join('assets/BAK.png'))
-        self.background = pygame.transform.scale(self.background, MAP_SIZE)
-=======
         default_background, _ = load_image('background_outline.png')
         self.background = default_background
-
->>>>>>> test
 
         # variables for when you're in some building
         self.in_building = False
@@ -152,15 +146,8 @@ class Game:
 
 
     def play(self):
-<<<<<<< HEAD
-        self.bell.play(8)
-        self.march.play()
-        time.sleep(2.2)
-        self.bell.play(7)
-=======
         self.bell.play(6)
         self.march.play()
->>>>>>> test
         while self.running:
             self.handle_event()
             self.draw()

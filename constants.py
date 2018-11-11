@@ -1,11 +1,11 @@
 WIDTH = X = 0
 HEIGHT = Y = 1
-SCALE = 3
+SCALE = 6
 
 MAP_SIZE = (640*SCALE, 640*SCALE)
 # TOWN_SIZE = (1280, 1280)
 # TODO make borders at some point, probably doesn't need town size
-SCREEN_SIZE = (640, 640)
+SCREEN_SIZE = (920, 640)
 CHARACTER_START = (4*100, 4*100)
 CHARACTER_SIZE = (64, 64)
 
