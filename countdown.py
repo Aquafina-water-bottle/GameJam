@@ -1,27 +1,35 @@
 import time
 import pygame
 
-beginning_time = time.time()
 COUNTDOWN_START = 60
 
-def get_countdown():
-    current_time = time.time()
-    countdown = COUNTDOWN_START - (current_time - beginning_time)
-    return countdown
+class Countdown:
+    def __init__(self):
+        self.beginning_time = 0
 
-def draw_countdown(screen, font):
-    # countdown = round(get_countdown(), 2)
+    def start(self):
+        self.beginning_time = time.time()
 
-    if get_countdown() < 0:
-        countdown = 0
-    else:
-        countdown = int(get_countdown()) + 1
+    def get(self):
+        current_time = time.time()
+        countdown = COUNTDOWN_START - (current_time - self.beginning_time)
+        return countdown
 
-    rendered_line = str(countdown)
-    text_render = font.render(rendered_line, True, pygame.Color("white"))
-    text_pos = text_render.get_rect()
-    text_pos.topright = screen.get_rect().topright
-    screen.blit(text_render, text_pos)
+    def draw(self, screen, font, fade_in):
+        # countdown = round(get_countdown(), 2)
+
+        if fade_in:
+            countdown = COUNTDOWN_START
+        elif self.get() < 0:
+            countdown = 0
+        else:
+            countdown = int(self.get()) + 1
+
+        rendered_line = str(countdown)
+        text_render = font.render(rendered_line, True, pygame.Color("white"))
+        text_pos = text_render.get_rect()
+        text_pos.topright = screen.get_rect().topright
+        screen.blit(text_render, text_pos)
 
 
 

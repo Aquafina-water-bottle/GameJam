@@ -2,6 +2,8 @@ import os
 
 import pygame
 
+from constants import *
+
 def load_image(name):
     png_name = os.path.join('assets', name)
     image = pygame.image.load(png_name)
@@ -23,6 +25,9 @@ class SpriteGroup:
         for sprite in self._sprite_dict.values():
             sprite.draw(screen, camera)
 
+    def __iter__(self):
+        return iter(self._sprite_dict.values())
+
     def update(self, *args, **kwargs):
         """
         empty, can be changed
@@ -30,16 +35,6 @@ class SpriteGroup:
         for sprite in self._sprite_dict.values():
             sprite.update(*args, **kwargs)
 
-
-class Building:
-    """
-    rect for collision, entrance
-    image for background
-    """
-    def __init__(self, dimension_rect, entrance_rect, png_name):
-        self.dimension_rect = dimension_rect
-        self.entrance_rect = entrance_rect
-        self.image, _ = load_image(png_name)
 
 # def create_buildings():
 #     buildings = {
@@ -105,8 +100,8 @@ class Sprite(pygame.sprite.Sprite):
 
     def get_relative(self, camera):
         relative_position = self.rect.copy()
-        relative_position.x += camera.x
-        relative_position.y += camera.y
+        relative_position.x += SCREEN_SIZE[X] // 2 - camera.x
+        relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
         return relative_position
 
     def draw(self, screen, camera):
@@ -114,9 +109,10 @@ class Sprite(pygame.sprite.Sprite):
         screen.blit(self.image, relative_position)
 
 class Collectible(Sprite):
-    def __init__(self, png_name, x, y, point_worth):
+    def __init__(self, png_name, x, y, point_worth, weight):
         super().__init__(png_name, x, y)
         self.point_worth = point_worth
+        self.weight = weight
         self.picked_up = False
 
     def update(self, character, camera):
@@ -126,6 +122,14 @@ class Collectible(Sprite):
     def draw(self, screen, camera):
         if not self.picked_up:
             super().draw(screen, camera)
+
+def create_collectibles():
+    sprite_dict = {
+        "well": Collectible("well_bottom.png", 100, 100, 5, 5),
+    }
+
+    group = SpriteGroup(sprite_dict)
+    return group
 
 
 
