@@ -4,6 +4,7 @@ import os
 
 from constants import *
 from countdown import *
+from sprites import *
 
 def main():
     game = Game()
@@ -22,6 +23,9 @@ class Coords:
     def copy(self):
         return Coords(self.x, self.y)
 
+    def __repr__(self):
+        return f"Coords(x={self.x}, y={self.y})"
+
 class Game:
     def __init__(self):
         # initialize the pygame module
@@ -39,17 +43,30 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
+        self.collectibles = self.create_collectibles()
 
-
-        self.character = Coords()
-        self.character.x = SCREEN_SIZE[X] // 2 - CHARACTER_SIZE[X] // 2
-        self.character.y = SCREEN_SIZE[Y] // 2 - CHARACTER_SIZE[Y] // 2
+        # specifies the top left corner of the character
+        self.character = pygame.Rect(
+            SCREEN_SIZE[X] // 2 - CHARACTER_SIZE[X] // 2,
+            SCREEN_SIZE[Y] // 2 - CHARACTER_SIZE[Y] // 2,
+            60, 60
+        )
 
         # temporarily transforms the background to the current resolution
         self.background = pygame.image.load(os.path.join('background-1.png'))
         self.background = pygame.transform.scale(self.background, MAP_SIZE)
 
-        self.camera = self.character.copy()
+        self.camera = Coords(self.character.x, self.character.y)
+
+    def create_collectibles(self):
+        well = Collectible("well_bottom.png", 50, 100, 5)
+
+        sprite_dict = {
+            "well": well,
+        }
+
+        group = SpriteGroup(sprite_dict)
+        return group
 
     def play(self):
         while self.running:
@@ -84,8 +101,15 @@ class Game:
         color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (self.camera.x, self.camera.y))
-        pygame.draw.rect(self.screen, color, pygame.Rect(self.character.x, self.character.y, 60, 60))
+        pygame.draw.rect(self.screen, color, self.character)
         pygame.draw.rect(self.screen, color, pygame.Rect(1000 + self.camera.x, 500 + self.camera.y, 60, 60))
+
+        # updates all collectibles
+        self.collectibles.update(self.character, self.camera)
+
+        # draws sprites
+        self.collectibles.draw(self.screen, self.camera)
+
         draw_countdown(self.screen, self.font)
         pygame.display.flip()
 

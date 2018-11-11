@@ -2,7 +2,7 @@ import time
 import pygame
 
 beginning_time = time.time()
-COUNTDOWN_START = 5
+COUNTDOWN_START = 60
 
 def get_countdown():
     current_time = time.time()
