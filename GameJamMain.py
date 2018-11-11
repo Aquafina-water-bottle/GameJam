@@ -41,6 +41,7 @@ class Game:
         self.running = True
         self.continue_game = True
         self.bell = pygame.mixer.Sound("assets/churchbell.wav")
+        self.march = pygame.mixer.Sound("assets/marching.wav")
         self.clock = pygame.time.Clock()
 
         self.collectibles = self.create_collectibles()
@@ -53,7 +54,7 @@ class Game:
         )
 
         # temporarily transforms the background to the current resolution
-        self.background = pygame.image.load(os.path.join('background-1.png'))
+        self.background = pygame.image.load(os.path.join('assets/BAK.png'))
         self.background = pygame.transform.scale(self.background, MAP_SIZE)
 
         self.camera = Coords(self.character.x, self.character.y)
@@ -69,9 +70,10 @@ class Game:
         return group
 
     def play(self):
-        self.bell.play(6)
+        self.bell.play(8)
+        self.march.play()
         time.sleep(2.2)
-        self.bell.play(5)
+        self.bell.play(7)
         while self.running:
             # play frame
             self.handle_event()
@@ -105,7 +107,6 @@ class Game:
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (self.camera.x, self.camera.y))
         pygame.draw.rect(self.screen, color, self.character)
-        pygame.draw.rect(self.screen, color, pygame.Rect(1000 + self.camera.x, 500 + self.camera.y, 60, 60))
 
         # updates all collectibles
         self.collectibles.update(self.character, self.camera)
