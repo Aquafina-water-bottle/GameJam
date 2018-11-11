@@ -53,8 +53,7 @@ class Game:
         # define a variable to control the main loop
         self.running = True
         self.continue_game = True
-        self.bell = pygame.mixer.Sound("assets/churchbell.wav")
-        self.march = pygame.mixer.Sound("assets/marching.wav")
+        self.ambient = pygame.mixer.Sound("assets/ambient.wav")
         self.clock = pygame.time.Clock()
         self.countdown = Countdown()
 
@@ -93,8 +92,6 @@ class Game:
     #     self._background = scale_surface(background)
 
     def play(self):
-        self.bell.play(6)
-        self.march.play()
         while self.running:
             self.user_input.update()
             self.countdown.update()
@@ -110,14 +107,13 @@ class Game:
         if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
             self.fade_in = False
             self.countdown.start()
-            self.bell.play(5)
+            self.ambient.play()
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
         # only do something if the event is of type QUIT
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             self.running = False
-
         # checks if the countdown ends
         if not self.fade_in and self.countdown.get() <= 0:
 
@@ -178,6 +174,8 @@ class Game:
         else:
             # checks whether they have left the building
             pass
+    
+
 
 
 # run the main function only if this module is executed as the main script
