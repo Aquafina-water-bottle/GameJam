@@ -46,7 +46,7 @@ class Building:
 def create_buildings():
     buildings_dict = {
         "main_house": Building(
-            position=pygame.Rect(200, 300, 500, 500),
+            position=pygame.Rect(500, 500, 500, 500),
             entrance=pygame.Rect(250, 450, 50, 50),
             exit_area=pygame.Rect(250, 450, 50, 50),
             background_png_name="sample_building2.png"

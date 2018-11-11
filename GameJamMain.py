@@ -73,7 +73,9 @@ class Game:
         #self.fade_in = False; self.countdown.start()  # because annoying
 
         # temporarily transforms the background to the current resolution
-        self.default_background, _ = load_image('background_outline.png')
+        self.default_background, _ = load_image('BACKROUND.png')
+        self.walls = load_image('background_outline.png', return_rect=False)
+        self.mask = pygame.mask.from_surface(self.walls)
         self.background = self.default_background
 
         # variables for when you're in some building
@@ -175,10 +177,6 @@ class Game:
                     self.current_building = building
                     self.background = self.current_building.background
                 # TODO doesn't actually work lmao
-            #     if building.collides(self.character, self.camera):
-            #         # moves back accordingly
-            #         self.character.move_back(self.camera, building.position, tuple(velocity))
-
         else:
             # checks whether they have left the building
             pass

@@ -24,7 +24,9 @@ def load_image(name, convert_alpha=False, use_scale=True, return_rect=True):
         image = image.convert_alpha()
     else:
         image = image.convert()
-    return image, image.get_rect()
+    if return_rect:
+        return image, image.get_rect()
+    return image
 
 class Coords:
     """

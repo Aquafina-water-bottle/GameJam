@@ -159,36 +159,6 @@ class Character(Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def move_back(self, camera, other, velocity):
-        """
-        given this rect collides with other_rect, moves back camera to the correct position
-
-        note that y increases as it goes down
-
-        velocity = tuple of (+/-1, +/-1) to determine which way it's moving
-        """
-        # TODO DOESN'T WORK REEE
-        # IDEA: make rect objects of 1 pixel length to represent the top areas and move back accordingly
-        # however, how to do masking then?
-
-
-        camera_bottom = camera.y + CHARACTER_SIZE[Y] // 2
-        camera_top = camera.y - CHARACTER_SIZE[Y] // 2
-        camera_right = camera.x + CHARACTER_SIZE[Y] // 2
-        camera_left = camera.x - CHARACTER_SIZE[Y] // 2
-
-        # when the camera is below the top and it's trying to move down: moves back up
-        if velocity[Y] == 1 and other.top < camera_bottom:
-            camera.y -= camera_bottom - other.top
-
-        # when the camera is above the bottom and it's trying to move up: moves back down
-        if velocity[Y] == -1 and other.bottom > camera_top:
-            camera.y += other.bottom - camera_top
-
-        # when the camera is trying to move to the right: moves back left
-        # (camera is to the right of the left part of other)
-        # if velocity[X] == 1 and other.left < camera_right:
-        #     print("moving right")
-        #     camera.x -= camera_right - other.left
-
+    def move_back():
+        pass
 
