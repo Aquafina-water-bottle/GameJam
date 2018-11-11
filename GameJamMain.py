@@ -69,7 +69,6 @@ class Character(pygame.Rect):
             camera.y += other.bottom - self.top
             print("changed: ", "top", self.top, "other top", other.top, "camera y", camera.y)
 
-
 class Game:
     def __init__(self):
         # initialize the pygame module
@@ -84,7 +83,7 @@ class Game:
         # define a variable to control the main loop
         self.running = True
         self.continue_game = True
-
+        self.bell = pygame.mixer.Sound("assets/churchbell.wav")
         self.clock = pygame.time.Clock()
 
         self.collectibles = create_collectibles()
@@ -114,6 +113,9 @@ class Game:
 
 
     def play(self):
+        self.bell.play(6)
+        time.sleep(2.2)
+        self.bell.play(5)
         while self.running:
             self.handle_event()
             self.draw()
