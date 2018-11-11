@@ -44,6 +44,8 @@ class Coords:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
+        self.previous_x = X
+        self.previous_y = y
 
     def copy(self):
         return Coords(self.x, self.y)
@@ -67,4 +69,8 @@ class Coords:
         self.x += other.x
         self.y += other.y
         return self
+
+    def store_previous(self):
+        self.previous_x = self.x
+        self.previous_y = self.y
 
