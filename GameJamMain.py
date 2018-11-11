@@ -1,12 +1,15 @@
 # import the pygame module, so you can use it
-import pygame
 import os
+import time
+
+import pygame
 
 from constants import *
 from countdown import *
 from sprites import *
 from building import *
 
+begin_time = time.time()
 
 """
 TODO (programming):
@@ -21,6 +24,8 @@ TODO (programming):
     - increment points to whatever
 
 - math for collectibles
+
+- fade in
 """
 
 def main():
@@ -48,26 +53,38 @@ class Character(pygame.Rect):
         super().__init__(*args, **kwargs)
         self.points_collected = 0
 
-    def get_relative(self, camera):
-        relative_position = self.copy()
-        relative_position.x += SCREEN_SIZE[X] // 2 - camera.x
-        relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
-        return relative_position
-
-    def move_back(self, camera, other):
+    def move_back(self, camera, other, velocity):
         """
         given this rect collides with other_rect, moves back camera to the correct position
 
         note that y increases as it goes down
 
-        TODO please fix
+        velocity = tuple of (+/-1, +/-1) to determine which way it's moving
         """
-        print("top", self.top, "other top", other.top, "camera y", camera.y)
 
-        # if the character top is above building bottom, it moves accordingly
-        if self.top < other.bottom:
-            camera.y += other.bottom - self.top
-            print("changed: ", "top", self.top, "other top", other.top, "camera y", camera.y)
+        print(velocity)
+
+        camera_bottom = camera.y + CHARACTER_SIZE[Y] // 2
+        camera_top = camera.y - CHARACTER_SIZE[Y] // 2
+        camera_right = camera.x + CHARACTER_SIZE[Y] // 2
+        camera_left = camera.x - CHARACTER_SIZE[Y] // 2
+
+        # when the camera is below the top and it's trying to move down: moves back up
+        if velocity[Y] == 1 and other.top < camera_bottom:
+            print("moving down")
+            camera.y -= camera_bottom - other.top
+
+        # when the camera is above the bottom and it's trying to move up: moves back down
+        if velocity[Y] == -1 and other.bottom > camera_top:
+            print("moving up")
+            camera.y += other.bottom - camera_top
+
+        # when the camera is trying to move to the right: moves back left
+        # (camera is to the right of the left part of other)
+        # if velocity[X] == 1 and other.left < camera_right:
+        #     print("moving right")
+        #     camera.x -= camera_right - other.left
+
 
 class Game:
     def __init__(self):
@@ -85,6 +102,7 @@ class Game:
         self.continue_game = True
         self.bell = pygame.mixer.Sound("assets/churchbell.wav")
         self.clock = pygame.time.Clock()
+        self.countdown = Countdown()
 
         self.collectibles = create_collectibles()
         self.buildings = create_buildings()
@@ -97,8 +115,10 @@ class Game:
         #     60, 60
         # )
 
+        self.fade_in = True
+
         # temporarily transforms the background to the current resolution
-        default_background, _ = load_image('sample_background.png')
+        default_background, _ = load_image('background_outline.png')
         self.background = default_background
 
         self.camera = Coords(*CHARACTER_START)
@@ -114,17 +134,22 @@ class Game:
 
     def play(self):
         self.bell.play(6)
-        time.sleep(2.2)
         self.bell.play(5)
         while self.running:
             self.handle_event()
             self.draw()
-            if self.continue_game:
+            print(self.continue_game, self.fade_in)
+            if self.continue_game and not self.fade_in:
                 self.update()
 
             self.clock.tick(60)
 
     def handle_event(self):
+        # checks if fading has ended
+        if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
+            self.fade_in = False
+            self.countdown.start()
+
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
         # only do something if the event is of type QUIT
@@ -133,7 +158,7 @@ class Game:
             self.running = False
 
         # checks if the countdown ends
-        if get_countdown() <= 0:
+        if not self.fade_in and self.countdown.get() <= 0:
 
             # can do stuff here idk
             self.continue_game = False
@@ -160,27 +185,48 @@ class Game:
         # draws sprites
         self.collectibles.draw(self.screen, self.camera)
 
-        draw_countdown(self.screen, self.font)
+        self.countdown.draw(self.screen, self.font, self.fade_in)
+
+        if self.fade_in:
+            alpha_value = int(255 - 255 * (time.time() - begin_time) / FADE_IN_TIME)
+            print("alpha:", alpha_value)
+            black_fade_surface = self.screen.copy()
+            black_fade_surface.fill(pygame.Color("black"))
+            black_fade_surface.set_alpha(alpha_value)
+
+            self.screen.blit(black_fade_surface, (0, 0))
+
         pygame.display.flip()
+
 
     def update(self):
         pressed = pygame.key.get_pressed()
+        velocity = [0, 0]
         if pressed[pygame.K_UP]:
             self.camera.y -= VELOCITY
+            velocity[Y] -= 1
         if pressed[pygame.K_DOWN]:
             self.camera.y += VELOCITY
+            velocity[Y] += 1
 
         if pressed[pygame.K_LEFT]:
             self.camera.x -= VELOCITY
+            velocity[X] -= 1
         if pressed[pygame.K_RIGHT]:
             self.camera.x += VELOCITY
+            velocity[X] += 1
 
         # checks for the building shit
         for building in self.buildings:
-            print("camera:", self.camera, "relative character:", self.character.get_relative(self.camera), "building top:", building.position.top)
-            if building.collides(self.character, self.camera):
-                # moves back accordingly
-                self.character.move_back(self.camera, building.position)
+            if building.enters(self.character, self.camera):
+                print("colliding with entrance")
+            else:
+                print()
+            # TODO doesn't actually work lmao
+        #     if building.collides(self.character, self.camera):
+        #         # moves back accordingly
+        #         self.character.move_back(self.camera, building.position, tuple(velocity))
+
 
         # gets character position for the next frame
 

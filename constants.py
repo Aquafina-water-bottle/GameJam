@@ -1,13 +1,15 @@
 WIDTH = X = 0
 HEIGHT = Y = 1
 
-MAP_SIZE = (1920, 1920)
-TOWN_SIZE = (1280, 1280)
+MAP_SIZE = (640*3, 640*3)
+# TOWN_SIZE = (1280, 1280)
+# TODO make borders at some point, probably doesn't need town size
 SCREEN_SIZE = (640, 640)
 CHARACTER_START = (0, 0)
 CHARACTER_SIZE = (64, 64)
 
 CHARACTER_MIDDLE = (SCREEN_SIZE[X] - CHARACTER_SIZE[X]) // 2, (SCREEN_SIZE[Y] - CHARACTER_SIZE[Y]) // 2
 
+FADE_IN_TIME = 2.2
 VELOCITY = 6
 

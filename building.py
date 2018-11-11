@@ -1,5 +1,6 @@
 import pygame
 from sprites import *
+from general import *
 
 class Building:
     """
@@ -13,24 +14,21 @@ class Building:
         self.entrance = pygame.Rect(entrance.x + position.x, entrance.y + position.y, entrance.width, entrance.height)
         self.background, _ = load_image(background_png_name)
 
-    def get_relative(self, camera):
-        relative_position = self.position.copy()
-        relative_position.x += SCREEN_SIZE[X] // 2 - camera.x
-        relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
-        return relative_position
-
-    def enters(self, camera):
-        return self.entrance.collidepoint((camera.x, camera.y))
+    def enters(self, character, camera):
+        return character.colliderect(get_relative(self.entrance, camera))
 
     def collides(self, character, camera):
-        return character.colliderect(self.get_relative(camera))
+        return character.colliderect(get_relative(self.position, camera))
 
     def _draw(self, screen, camera):
         """
         TEMPORARY
         """
-        relative_position = self.get_relative(camera)
+        relative_position = get_relative(self.position, camera)
         screen.blit(self.background, relative_position)
+
+        relative_position = get_relative(self.entrance, camera)
+        pygame.draw.rect(screen, pygame.Color("orange"), relative_position)
 
 
 def create_buildings():
