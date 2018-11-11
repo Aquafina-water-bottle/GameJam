@@ -25,6 +25,9 @@ class SpriteGroup:
         for sprite in self._sprite_dict.values():
             sprite.draw(screen, camera)
 
+    def __iter__(self):
+        return iter(self._sprite_dict.values())
+
     def update(self, *args, **kwargs):
         """
         empty, can be changed
@@ -32,16 +35,6 @@ class SpriteGroup:
         for sprite in self._sprite_dict.values():
             sprite.update(*args, **kwargs)
 
-
-class Building:
-    """
-    rect for collision, entrance
-    image for background
-    """
-    def __init__(self, dimension_rect, entrance_rect, png_name):
-        self.dimension_rect = dimension_rect
-        self.entrance_rect = entrance_rect
-        self.image, _ = load_image(png_name)
 
 # def create_buildings():
 #     buildings = {
@@ -128,6 +121,14 @@ class Collectible(Sprite):
     def draw(self, screen, camera):
         if not self.picked_up:
             super().draw(screen, camera)
+
+def create_collectibles():
+    sprite_dict = {
+        "well": Collectible("well_bottom.png", 100, 100, 5),
+    }
+
+    group = SpriteGroup(sprite_dict)
+    return group
 
 
 

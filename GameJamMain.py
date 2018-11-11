@@ -5,6 +5,7 @@ import os
 from constants import *
 from countdown import *
 from sprites import *
+from building import *
 
 
 """
@@ -47,6 +48,26 @@ class Character(pygame.Rect):
         super().__init__(*args, **kwargs)
         self.points_collected = 0
 
+    def get_relative(self, camera):
+        relative_position = self.copy()
+        relative_position.x += SCREEN_SIZE[X] // 2 - camera.x
+        relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
+        return relative_position
+
+    def move_back(self, camera, other):
+        """
+        given this rect collides with other_rect, moves back camera to the correct position
+
+        note that y increases as it goes down
+
+        TODO please fix
+        """
+        print("top", self.top, "other top", other.top, "camera y", camera.y)
+
+        # if the character top is above building bottom, it moves accordingly
+        if self.top < other.bottom:
+            camera.y += other.bottom - self.top
+            print("changed: ", "top", self.top, "other top", other.top, "camera y", camera.y)
 
 
 class Game:
@@ -66,7 +87,8 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-        self.collectibles = self.create_collectibles()
+        self.collectibles = create_collectibles()
+        self.buildings = create_buildings()
 
         # specifies the middle of the screen
         self.character = Character(CHARACTER_MIDDLE, CHARACTER_SIZE)
@@ -77,7 +99,7 @@ class Game:
         # )
 
         # temporarily transforms the background to the current resolution
-        default_background = pygame.image.load(os.path.join('background-1.png'))
+        default_background, _ = load_image('sample_background.png')
         self.background = default_background
 
         self.camera = Coords(*CHARACTER_START)
@@ -91,19 +113,10 @@ class Game:
         self._background = pygame.transform.scale(background, MAP_SIZE)
 
 
-    def create_collectibles(self):
-        sprite_dict = {
-            "well": Collectible("well_bottom.png", 100, 100, 5),
-        }
-
-        group = SpriteGroup(sprite_dict)
-        return group
-
     def play(self):
         while self.running:
             self.handle_event()
             self.draw()
-            print(self.camera)
             if self.continue_game:
                 self.update()
 
@@ -138,6 +151,10 @@ class Game:
         # updates all collectibles
         self.collectibles.update(self.character, self.camera)
 
+        # NOTE: TEMPORARY!!!
+        for building in self.buildings:
+            building._draw(self.screen, self.camera)
+
         # draws sprites
         self.collectibles.draw(self.screen, self.camera)
 
@@ -155,6 +172,15 @@ class Game:
             self.camera.x -= VELOCITY
         if pressed[pygame.K_RIGHT]:
             self.camera.x += VELOCITY
+
+        # checks for the building shit
+        for building in self.buildings:
+            print("camera:", self.camera, "relative character:", self.character.get_relative(self.camera), "building top:", building.position.top)
+            if building.collides(self.character, self.camera):
+                # moves back accordingly
+                self.character.move_back(self.camera, building.position)
+
+        # gets character position for the next frame
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
