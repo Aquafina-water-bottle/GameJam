@@ -3,7 +3,7 @@ import os
 import time
 
 import pygame
-
+from win import win
 from constants import *
 from countdown import Countdown
 from collectibles import create_collectibles
@@ -46,8 +46,8 @@ class Game:
         self.font = pygame.font.Font(None, 100)
         pygame.display.set_caption("Escape The Village")
 
-        # create a surface on screen that has the size of 240 x 180
-        # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+        # create a surface on screen that has the size of 240 x 180144
+        # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)entrance
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
 
         # define a variable to control the main loop
@@ -57,9 +57,12 @@ class Game:
         self.march = pygame.mixer.Sound("assets/marching.wav")
         self.clock = pygame.time.Clock()
         self.countdown = Countdown()
-
+        self.win1 = win(200 * SCALE, 280 * SCALE, 40 * SCALE, 20 * SCALE)
+        self.win2 = win(400 * SCALE, 200 * SCALE, 60 * SCALE, 40 * SCALE)
+        self.win3 = win(610 * SCALE, 330 * SCALE, 60 * SCALE, 20 * SCALE)
         self.collectibles = create_collectibles()
         self.buildings = create_buildings()
+        self.end = False
 
         # specifies the middle of the screen
         self.character = Character("MC-front.png", 0, 0)
@@ -100,6 +103,8 @@ class Game:
             self.countdown.update()
             self.handle_event()
             self.draw()
+            if self.end:
+                self.ended()
             if self.continue_game and not self.fade_in:
                 self.update()
                 print(self.camera)
@@ -129,6 +134,7 @@ class Game:
             self.running = False
 
     def draw(self):
+        from general import get_relative
         color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
@@ -139,8 +145,8 @@ class Game:
             self.collectibles.update(self.character, self.camera)
 
         # NOTE: TEMPORARY!!!
-        for building in self.buildings:
-            building.debug_draw_position(self.screen, self.camera)
+        #for building in self.buildings:
+           # building.debug_draw_position(self.screen, self.camera)
 
         # draws sprites
         self.collectibles.draw(self.screen, self.camera)
@@ -157,9 +163,7 @@ class Game:
             black_fade_surface = self.screen.copy()
             black_fade_surface.fill(pygame.Color("black"))
             black_fade_surface.set_alpha(alpha_value)
-
             self.screen.blit(black_fade_surface, (0, 0))
-
         pygame.display.flip()
 
 
@@ -177,9 +181,21 @@ class Game:
                     self.current_building = building
                     self.background = self.current_building.background
                 # TODO doesn't actually work lmao
+                if self.win1.collide(self.camera, self.character):
+                    self.end = True
         else:
             # checks whether they have left the building
             pass
+
+    def ended(self):
+        # where alpha_value decreases from 255 to 0
+        alpha_value = int(255 * (time.time() - begin_time) / FADE_IN_TIME)
+        black_fade_surface = self.screen.copy()
+        black_fade_surface.fill(pygame.Color("black"))
+        black_fade_surface.set_alpha(alpha_value)        
+        self.continue_game = False
+        
+
 
 
 # run the main function only if this module is executed as the main script
@@ -188,3 +204,5 @@ if __name__ == "__main__":
     # call the main function
     main()
 
+
+                
