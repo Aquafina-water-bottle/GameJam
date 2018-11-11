@@ -2,6 +2,8 @@ import os
 
 import pygame
 
+from constants import *
+
 def load_image(name):
     png_name = os.path.join('assets', name)
     image = pygame.image.load(png_name)
@@ -105,8 +107,8 @@ class Sprite(pygame.sprite.Sprite):
 
     def get_relative(self, camera):
         relative_position = self.rect.copy()
-        relative_position.x += camera.x
-        relative_position.y += camera.y
+        relative_position.x += SCREEN_SIZE[X] // 2 - camera.x
+        relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
         return relative_position
 
     def draw(self, screen, camera):

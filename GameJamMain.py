@@ -92,10 +92,8 @@ class Game:
 
 
     def create_collectibles(self):
-        well = Collectible("well_bottom.png", 50, 100, 5)
-
         sprite_dict = {
-            "well": well,
+            "well": Collectible("well_bottom.png", 100, 100, 5),
         }
 
         group = SpriteGroup(sprite_dict)
@@ -132,7 +130,7 @@ class Game:
     def draw(self):
         color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
-        self.screen.blit(self.background, (self.camera.x + SCREEN_SIZE[X] // 2, self.camera.y + SCREEN_SIZE[Y] // 2))
+        self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
         pygame.draw.rect(self.screen, color, self.character)
         # pygame.draw.rect(self.screen, color, pygame.Rect(1000 + self.camera.x, 500 + self.camera.y, 60, 60))
         # pygame.draw.rect(self.screen, color, pygame.Rect(100 + self.camera.x, 100 + self.camera.y, 60, 60))
@@ -149,14 +147,14 @@ class Game:
     def update(self):
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_UP]:
-            self.camera.y += VELOCITY
-        if pressed[pygame.K_DOWN]:
             self.camera.y -= VELOCITY
+        if pressed[pygame.K_DOWN]:
+            self.camera.y += VELOCITY
 
         if pressed[pygame.K_LEFT]:
-            self.camera.x += VELOCITY
-        if pressed[pygame.K_RIGHT]:
             self.camera.x -= VELOCITY
+        if pressed[pygame.K_RIGHT]:
+            self.camera.x += VELOCITY
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
