@@ -72,10 +72,17 @@ class Game:
         #self.fade_in = False; self.countdown.start()  # because annoying
 
         # temporarily transforms the background to the current resolution
-        self.default_background, _ = load_image('BACKROUND.png')
-        self.walls = load_image('background_outline.png', return_rect=False)
-        self.mask = pygame.mask.from_surface(self.walls)
-        self.background = self.default_background
+        self.default_background = load_image('BACKROUND.png', return_rect=False)
+
+        self.building_wall_mask = load_image('background_outline2.png', convert_alpha=True, return_rect=False)
+        # self.building_wall_mask = pygame.mask.from_surface(walls)
+
+        # character mask is a literal constant one pixel at the base of the
+        # self.character_mask = "deeznuts"
+
+        # NOTE debugging purposes until mask is properly resized
+        #self.background = self.default_background
+        self.background = self.building_wall_mask
 
         # variables for when you're in some building
         self.in_building = False
@@ -114,9 +121,9 @@ class Game:
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             self.running = False
+
         # checks if the countdown ends
         if not self.fade_in and self.countdown.get() <= 0:
-
             # can do stuff here idk
             self.continue_game = False
 
@@ -124,7 +131,6 @@ class Game:
             self.running = False
 
     def draw(self):
-        color = (255, 100, 0)
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
         # pygame.draw.rect(self.screen, color, self.character)
@@ -163,6 +169,14 @@ class Game:
         self.camera += velocity
         self.character.update(velocity, self.countdown.tick)
 
+        # detects collision with walls and buildings
+        pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
+        if pixel[3] > ALPHA_THRESHOLD:
+            # TODO move back character
+            print("COLLIDES")
+        else:
+            print()
+
         if not self.in_building:
             # checks for the building shit
             for building in self.buildings:
@@ -174,7 +188,7 @@ class Game:
         else:
             # checks whether they have left the building
             pass
-    
+
 
 
 

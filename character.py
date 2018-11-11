@@ -2,7 +2,7 @@ import pygame
 
 from typing import NamedTuple
 from sprites import Sprite
-from general import load_image
+from general import load_image, get_relative, Coords
 from constants import *
 
 class Pose:
@@ -185,6 +185,23 @@ class Character(Sprite):
                 else:
                     image_pose = self.images["moving-down-right"]
         self.image = image_pose[self.pose.animation_index]
+
+    def get_rect_at_feet(self, camera):
+        # 4 pixels from main image
+        height = (4*SCALE)
+        relative_rect = get_relative(self.rect, camera)
+
+        x = relative_rect.x
+        y = relative_rect.y + (self.rect.height // 2 - height)
+        return pygame.Rect(x, y, self.rect.width, height)
+
+    def get_pixel_at_feet(self, camera):
+        # relative_rect = get_relative(self.rect, camera)
+        x = camera.x
+        y = camera.y + self.rect.height // 2
+
+        return Coords(x, y)
+
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)

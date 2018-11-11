@@ -5,6 +5,9 @@ import pygame
 from constants import *
 
 def get_relative(rect, camera):
+    """
+    gets position relative to the camera
+    """
     relative_position = rect.copy()
     relative_position.x += SCREEN_SIZE[X] // 2 - camera.x
     relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
@@ -54,6 +57,9 @@ class Coords:
 
     def __repr__(self):
         return "Coords(x={}, y={})".format(self.x, self.y)
+
+    def __iter__(self):
+        return iter((self.x, self.y))
 
     def __add__(self, other):
         if not isinstance(other, Coords):
