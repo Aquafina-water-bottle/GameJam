@@ -24,7 +24,7 @@ class Coords:
         return Coords(self.x, self.y)
 
     def __repr__(self):
-        return f"Coords(x={self.x}, y={self.y})"
+        return "Coords(x={self.x}, y={self.y})"
 
 class Game:
     def __init__(self):
@@ -40,7 +40,7 @@ class Game:
         # define a variable to control the main loop
         self.running = True
         self.continue_game = True
-
+        self.bell = pygame.mixer.Sound("assets/churchbell.wav")
         self.clock = pygame.time.Clock()
 
         self.collectibles = self.create_collectibles()
@@ -69,6 +69,9 @@ class Game:
         return group
 
     def play(self):
+        self.bell.play(6)
+        time.sleep(2.2)
+        self.bell.play(5)
         while self.running:
             # play frame
             self.handle_event()

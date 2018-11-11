@@ -26,4 +26,3 @@ def draw_countdown(screen, font):
 
 
 
-
