@@ -107,6 +107,7 @@ class Game:
         self.running = True
         self.continue_game = True
         self.bell = pygame.mixer.Sound("assets/churchbell.wav")
+        self.march = pygame.mixer.Sound("assets/marching.wav")
         self.clock = pygame.time.Clock()
         self.countdown = Countdown()
 
@@ -147,6 +148,7 @@ class Game:
     def play(self):
         self.bell.play(6)
         self.bell.play(5)
+        self.march.play()
         while self.running:
             self.handle_event()
             self.draw()
@@ -189,7 +191,7 @@ class Game:
         else:
             self.holding_f = self.clicked_f = False
 
-        print(self.holding_f, self.clicked_f)
+        # print(self.holding_f, self.clicked_f)
 
     def draw(self):
         color = (255, 100, 0)
