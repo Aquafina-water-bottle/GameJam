@@ -11,12 +11,10 @@ class UserInput:
     """
     def __init__(self):
         self.holding_interact = False
-        self.tick = 0
         self.storage_tick = -1
 
     def update(self):
         self.pressed = pygame.key.get_pressed()
-        self.tick += 1
 
     def clicked_quit(self):
         return self.pressed[K_q]
@@ -38,11 +36,11 @@ class UserInput:
 
         return velocity
 
-    def clicked_interact(self):
+    def clicked_interact(self, tick):
         # currently keyboard F
 
         # already calculated in the same frame
-        if self.tick == self.storage_tick:
+        if tick == self.storage_tick:
             return True
 
         # so that interact can be pressed once and not held down
@@ -50,7 +48,7 @@ class UserInput:
         if self.pressed[K_f]:
             if not self.holding_interact:
                 self.holding_interact = True
-                self.storage_tick = self.tick
+                self.storage_tick = tick
                 return True
         else:
             self.holding_interact = False

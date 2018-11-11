@@ -14,7 +14,7 @@ def scale_surface(surface):
     new_resolution = (surface.get_width()*SCALE, surface.get_height()*SCALE)
     return pygame.transform.scale(surface, new_resolution)
 
-def load_image(name, convert_alpha=False, use_scale=True, return_rect=True):
+def load_image(name, convert_alpha=False, use_scale=True, flip=False, return_rect=True):
     png_name = os.path.join('assets', name)
     image = pygame.image.load(png_name)
     if use_scale:
@@ -24,7 +24,13 @@ def load_image(name, convert_alpha=False, use_scale=True, return_rect=True):
         image = image.convert_alpha()
     else:
         image = image.convert()
-    return image, image.get_rect()
+
+    if flip:
+        image = pygame.transform.flip(image, True, False)
+
+    if return_rect:
+        return image, image.get_rect()
+    return image
 
 class Coords:
     """

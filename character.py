@@ -16,6 +16,7 @@ class Pose:
         # 1 = facing right
         self.facing_right_left = 0
         self.facing_down = True
+        self.animation_index = 0
 
     @property
     def facing_left(self):
@@ -38,9 +39,12 @@ class Pose:
     def set_facing_right(self):
         self.facing_right_left = 1
 
+    def increment(self, max_index):
+        self.animation_index = (self.animation_index + 1) % max_index
+
     @property
     def facing_up(self):
-        return not self.facing_up
+        return not self.facing_down
 
     @facing_up.setter
     def facing_up(self, facing_up):
@@ -53,18 +57,16 @@ class Pose:
 
         return both_standing and both_facing_right_left and both_facing_down
 
+    def __repr__(self):
+        return "Pose(standing={}, facing_right_left={}, facing_down={})".format(self.standing, self.facing_right_left, self.facing_down)
+
 
 class PoseImages:
-    def __init__(self, png_name_1, png_name_2):
-        self.frame_1 = load_image(png_name_1, convert_alpha=True, return_rect=False)
-        self.frame_2 = load_image(png_name_2, convert_alpha=True, return_rect=False)
+    def __init__(self, *png_names, flip=False):
+        self.frames = tuple(load_image(png_name, convert_alpha=True, flip=flip, return_rect=False) for png_name in png_names)
 
     def __getitem__(self, index):
-        if index == 0:
-            return self.frame_1
-        if index == 1:
-            return self.frame_2
-        return NotImplemented
+        return self.frames[index]
 
 class Character(Sprite):
     """
@@ -94,21 +96,19 @@ class Character(Sprite):
         #   right = down-right, left = up = down-left
         # standing
         self.pose = Pose()
-        self.animation_index = 0
 
         # prerenders all images
         self.images = {
-            "standing-face-down": load_image("MC-front.png", return_rect=False),
-            "standing-face-up": load_image("MC-Back.png", return_rect=False),
+            "standing-face-down": PoseImages("MC-front.png"),
+            "standing-face-up": PoseImages("MC-Back.png"),
 
+            "moving-up-right": PoseImages("MC-front-Lup.png", "MC-front-Rup.png", flip=True),
             "moving-up": PoseImages("MC-front-for-Lup.png", "MC-front-for-Rup.png"),
+            "moving-up-left": PoseImages("MC-front-Lup.png", "MC-front-Rup.png"),
+
+            "moving-down-right": PoseImages("MC-Back-Lup.png", "MC-Back-Rup.png", flip=True),
             "moving-down": PoseImages("MC-Back-for-Lup.png", "MC-Back-for-Rup.png"),
-
-            "moving-up-right": PoseImages("MC-front-Lup.png", "MC-front-for-Rup.png"),
-            "moving-up-left": PoseImages("MC-front-for-Lup.png", "MC-front-Rup.png"),
-
-            "moving-down-right": PoseImages("MC-Back-Lup.png", "MC-Back-for-Rup.png"),
-            "moving-down-left": PoseImages("MC-Back-for-Lup.png", "MC-Back-Rup.png"),
+            "moving-down-left": PoseImages("MC-Back-Lup.png", "MC-Back-Rup.png"),
         }
 
         # for specific inventory items
@@ -121,40 +121,70 @@ class Character(Sprite):
         pose = Pose()
 
         if velocity[Y] > 0:
-            self.pose.facing_down = True
+            pose.facing_down = True
         elif velocity[Y] < 0:
-            self.pose.facing_up = True
-        else:
-            self.pose.standing = True
+            pose.facing_up = True
 
         if velocity[X] > 0:
-            self.pose.set_facing_right()
+            pose.set_facing_right()
         elif velocity[X] < 0:
-            self.pose.set_facing_left()
+            pose.set_facing_left()
         else:
-            self.pose.set_facing_not_right_left()
+            pose.set_facing_not_right_left()
 
-        if pose != self.pose:
-            self.pose = pose
-            self.animation_index = 0
+        if velocity[X] == 0 and velocity[Y] == 0:
+            pose.standing = True
+
+        # if changed from not standing to standing, it preserves facing up or down
+        if pose.standing and not self.pose.standing:
+            self.pose.standing = True
+            self.pose.animation_index = 0
             self.update_walk_pose()
-            return
 
-        if tick % RUNNING_ANIMATION_DELAY == 0:
-            self.animation_index = (self.animation_index + 1) % 2
+        # otherwise, it just replaces the entire pose if they both differ completely
+        elif not pose.standing and pose != self.pose:
+            self.pose = pose
+            self.update_walk_pose()
+
+        # updates the animation tick when moving
+        elif not self.pose.standing and tick % RUNNING_ANIMATION_DELAY == 0:
+            # checks if the pose is directly moving up and down and not left and right
+            if self.pose.facing_not_right_left:
+                self.pose.increment(2)
+            else:
+                self.pose.increment(2)
             self.update_walk_pose()
 
     def update_walk_pose(self):
         if self.pose.standing:
             if self.pose.facing_up:
-                self.image = self.images["standing-up"]
+                image_pose = self.images["standing-face-up"]
+                asdf = "standing-face-up"
             else:
-                self.image = self.images["standing-down"]
+                image_pose = self.images["standing-face-down"]
+                asdf = "standing-face-down"
         else:
             if self.pose.facing_down:
-                pass
-                # if self.pose.
-        pass
+                if self.pose.facing_left:
+                    image_pose = self.images["moving-up-left"]
+                    asdf = "moving-up-left"
+                elif self.pose.facing_not_right_left:
+                    image_pose = self.images["moving-up"]
+                    asdf = "moving-up"
+                else:
+                    image_pose = self.images["moving-up-right"]
+                    asdf = "moving-up-right"
+            else:
+                if self.pose.facing_left:
+                    image_pose = self.images["moving-down-left"]
+                    asdf = "moving-down-right"
+                elif self.pose.facing_not_right_left:
+                    image_pose = self.images["moving-down"]
+                    asdf = "moving-down"
+                else:
+                    image_pose = self.images["moving-down-right"]
+                    asdf = "moving-down-right"
+        self.image = image_pose[self.pose.animation_index]
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)

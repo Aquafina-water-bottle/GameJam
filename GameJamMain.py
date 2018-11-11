@@ -100,7 +100,6 @@ class Game:
             self.draw()
             if self.continue_game and not self.fade_in:
                 self.update()
-                print(self.camera)
 
             self.clock.tick(60)
 
@@ -133,7 +132,7 @@ class Game:
         # pygame.draw.rect(self.screen, color, self.character)
 
         # updates all collectibles only when "F" is pressed
-        if self.user_input.clicked_interact():
+        if self.user_input.clicked_interact(self.countdown.tick):
             self.collectibles.update(self.character, self.camera)
 
         # NOTE: TEMPORARY!!!
@@ -162,7 +161,6 @@ class Game:
 
 
     def update(self):
-        pressed = pygame.key.get_pressed()
         velocity = self.user_input.get_velocity()
         self.camera += velocity
         self.character.update(velocity, self.countdown.tick)
@@ -170,7 +168,7 @@ class Game:
         if not self.in_building:
             # checks for the building shit
             for building in self.buildings:
-                if building.enters(self.character, self.camera) and self.user_input.clicked_interact():
+                if building.enters(self.character, self.camera) and self.user_input.clicked_interact(self.countdown.tick):
                     self.in_building = True
                     self.current_building = building
                     self.background = self.current_building.background
