@@ -118,8 +118,8 @@ class Game:
         self.character = Character(CHARACTER_MIDDLE, CHARACTER_SIZE)
 
         # TODO remove to add fade in
-        #self.fade_in = True
-        self.fade_in = False; self.countdown.start()  # because annoying
+        self.fade_in = True
+        #self.fade_in = False; self.countdown.start()  # because annoying
 
         self.clicked_f = False
         self.holding_f = False
@@ -147,7 +147,6 @@ class Game:
 
     def play(self):
         self.bell.play(6)
-        self.bell.play(5)
         self.march.play()
         while self.running:
             self.handle_event()
@@ -162,7 +161,7 @@ class Game:
         if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
             self.fade_in = False
             self.countdown.start()
-
+            self.bell.play(5)
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
         # only do something if the event is of type QUIT
