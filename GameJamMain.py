@@ -34,6 +34,8 @@ TODO (programming):
 - win condition
     - math for collectibles
     - areas for winning
+
+- get jared ssh lmao
 """
 
 def main():
@@ -155,6 +157,7 @@ class Game:
         if self.fade_out and time.time() - self.fade_out_begin > FADE_OUT_TIME:
             # self.fade_out = False
             self.ended = True
+            print("ended?")
 
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
@@ -173,7 +176,7 @@ class Game:
 
         if self.user_input.pause():
             self.paused = True
-            
+
 
 
     def draw(self):
@@ -344,7 +347,7 @@ class Game:
 
     def pause_input(self, play_button, exit_button):
         event = pygame.event.poll()
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             pos = pygame.mouse.get_pos()
             if play_button.collidepoint(pos):
                 self.paused = False
@@ -352,7 +355,7 @@ class Game:
                 print("argh")
                 self.ended = True
                 self.paused = False
-        
+
 
 
 # run the main function only if this module is executed as the main script

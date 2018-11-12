@@ -41,7 +41,7 @@ class MainMenu:
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_q]:
             self.running = False
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             pos = pygame.mouse.get_pos()
             if self.play_button.collidepoint(pos):
                 self.play_selected = True
