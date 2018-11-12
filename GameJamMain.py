@@ -38,6 +38,7 @@ TODO (programming):
 """
 
 def main():
+    loop = True
     pygame.init()
     pygame.display.set_caption("Escape The Village")
 
@@ -46,9 +47,13 @@ def main():
     screen = pygame.display.set_mode(SCREEN_SIZE)
     mainMenu = MainMenu(screen, SCREEN_SIZE)
     game = Game(screen)
-    if mainMenu.play():
-        game.play()
-
+    while loop:
+        mainMenu = MainMenu(screen, SCREEN_SIZE)
+        game = Game(screen)
+        if mainMenu.play():
+            game.play()
+        else:
+            loop = False
 
 class Game:
     def __init__(self, screen):
@@ -79,6 +84,7 @@ class Game:
         self.character.rect.y = SCREEN_SIZE[Y]//2 - self.character.rect.height//2
 
         self.user_input = UserInput()
+        self.paused = False
 
         # TODO remove to add fade in
         self.fade_in = True
@@ -122,11 +128,8 @@ class Game:
 
             if self.continue_game and not self.fade_in:
                 self.update()
-
+            self.pause()
             self.clock.tick(60)
-
-        if self.ended:
-            self.end()
 
     def handle_event(self):
         # checks if fading has end
@@ -154,6 +157,11 @@ class Game:
         if self.user_input.clicked_quit():
             self.running = False
 
+        if self.user_input.pause():
+            self.paused = True
+            
+
+
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
@@ -175,7 +183,8 @@ class Game:
             win.debug_draw(self.camera, self.screen)
 
         # draws countdown
-        self.countdown.draw(self.screen, self.font, self.fade_in)
+        if not self.paused:
+            self.countdown.draw(self.screen, self.font, self.fade_in)
 
         # draws character at the last lmao
         self.character.draw(self.screen)
@@ -195,8 +204,8 @@ class Game:
             black_fade_surface.fill(pygame.Color("black"))
             black_fade_surface.set_alpha(alpha_value)
             self.screen.blit(black_fade_surface, (0, 0))
-
-        pygame.display.flip()
+        if not self.paused:
+            pygame.display.flip()
 
 
     def update(self):
@@ -231,9 +240,55 @@ class Game:
             # checks whether they have left the building
             pass
 
-    def end(self):
-        pass
+    def pause(self):
+        while self.paused:
+            self.draw()
+            black_surface = self.screen.copy()
+            black_surface.fill(pygame.Color("black"))
+            black_surface.set_alpha(100)
+            self.screen.blit(black_surface, (0,0))
+            play_button, play_image, play_x, play_y = self.make_continue_button()
+            exit_button, exit_image, exit_x, exit_y = self.make_exit_button()
+            pygame.draw.rect(self.screen, pygame.Color("orange"), play_button)
+            self.screen.blit(play_image, (play_x, play_y))
+            pygame.draw.rect(self.screen, pygame.Color("orange"), exit_button)
+            self.screen.blit(exit_image, (exit_x, exit_y))
+            pygame.display.flip()
+            self.pause_input(play_button, exit_button)
 
+    def make_continue_button(self):
+        play_image = pygame.image.load(os.path.join('assets/Resumebutton.png'))
+        x = SCREEN_SIZE[0]
+        y = SCREEN_SIZE[1]
+        play_x = int(x * 0.3)
+        play_width = int(x * 0.4)
+        play_y = int(y * 0.4)
+        play_height = int(y * 0.15)
+        play_image = pygame.transform.scale(play_image, (play_width, play_height))
+        return pygame.Rect(play_x, play_y, play_width, play_height), play_image, play_x, play_y
+
+    def make_exit_button(self):
+        exit_image = pygame.image.load(os.path.join('assets/quit button .png'))
+        x = SCREEN_SIZE[0]
+        y = SCREEN_SIZE[1]
+        exit_x = int(x * 0.3)
+        exit_width = int(x * 0.4)
+        exit_y = int(y * 0.57)
+        exit_height = int(y * 0.15)
+        exit_image = pygame.transform.scale(exit_image, (exit_width, exit_height))
+        return pygame.Rect(exit_x, exit_y, exit_width, exit_height), exit_image, exit_x, exit_y
+
+    def pause_input(self, play_button, exit_button):
+        event = pygame.event.poll()
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            pos = pygame.mouse.get_pos()
+            if play_button.collidepoint(pos):
+                self.paused = False
+            elif exit_button.collidepoint(pos):
+                print("argh")
+                self.ended = True
+                self.paused = False
+        
 
 
 # run the main function only if this module is executed as the main script
@@ -241,7 +296,3 @@ class Game:
 if __name__ == "__main__":
     # call the main function
     main()
-
-
-
-

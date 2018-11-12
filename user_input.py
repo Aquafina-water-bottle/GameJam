@@ -1,5 +1,5 @@
 import pygame
-from pygame import K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d, K_f, K_q
+from pygame import K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d, K_f, K_q, K_ESCAPE
 
 from constants import *
 from general import Coords
@@ -18,6 +18,9 @@ class UserInput:
 
     def clicked_quit(self):
         return self.pressed[K_q]
+
+    def pause(self):
+        return self.pressed[K_ESCAPE]
 
     def get_velocity(self):
         """
