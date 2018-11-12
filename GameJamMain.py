@@ -45,20 +45,19 @@ def main():
         # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)entrance
     screen = pygame.display.set_mode(SCREEN_SIZE)
     mainMenu = MainMenu(screen, SCREEN_SIZE)
-    game = Game(screen)
     while loop:
         mainMenu = MainMenu(screen, SCREEN_SIZE)
-        game = Game(screen)
+        game = Game(screen, loop)
         if mainMenu.play():
-            game.play()
+            loop = game.play()
         else:
             loop = False
 
 class Game:
-    def __init__(self, screen):
+    def __init__(self, screen, loop):
         # initialize the pygame module
         self.screen = screen
-
+        self.loop = loop
         self.font = pygame.font.Font(None, 100)
 
         # define a variable to control the main loop
@@ -128,6 +127,7 @@ class Game:
         return self.current_building is not None
 
     def play(self):
+        self.beginning()
         while self.running and not self.ended:
             self.user_input.update()
             self.countdown.update()
@@ -138,11 +138,13 @@ class Game:
                 self.update()
             self.pause()
             self.clock.tick(60)
+        return self.loop
 
         if DEBUG:
             print("debug: temp =", self.temp)
 
-        print("collected {}".format(self.character.items))
+            print("collected {}".format(self.character.items))
+
 
     def handle_event(self):
         # checks if fading has end
@@ -162,6 +164,7 @@ class Game:
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             self.running = False
+            self.loop = False
 
         # checks if the countdown ends
         if not self.fade_in and not self.fade_out and self.countdown.get() <= 0:
@@ -174,6 +177,8 @@ class Game:
         if self.user_input.pause():
             self.paused = True
             
+    def beginning(self):
+        self.screen.fill((0, 0, 0))
 
 
     def draw(self):
@@ -305,6 +310,7 @@ class Game:
         self.countdown.stop()
 
     def pause(self):
+        self.user_input.update()
         while self.paused:
             self.draw()
             black_surface = self.screen.copy()
@@ -349,9 +355,16 @@ class Game:
             if play_button.collidepoint(pos):
                 self.paused = False
             elif exit_button.collidepoint(pos):
-                print("argh")
                 self.ended = True
                 self.paused = False
+        if event.type == pygame.QUIT:
+            # change the value to False, to exit the main loop
+            self.running = False
+            self.loop = False
+            self.paused = False
+        if self.user_input.pause():
+            self.paused = False
+
         
 
 
