@@ -67,16 +67,16 @@ class Game:
         self.notification_timer = Timer()
         self.fade_out_timer = Timer()
 
+        # variables for when you're in some building
+        self.current_building = None
+        self.buildings = create_buildings()
+        self.well_area = ScaledRect(208, 354, 60, 51)
+
         # define a variable to control the main loop
         # where it is really only set to false if the player exits or the X button is pressed
         self.running = True
         self.state = None
         self.fade_into_main_menu()
-
-        # variables for when you're in some building
-        self.current_building = None
-        self.buildings = create_buildings()
-        self.well_area = ScaledRect(208, 354, 60, 51)
 
         self.wins = create_wins()
         self.subtext_value = ""
@@ -467,6 +467,9 @@ class Game:
         self.countdown.pause()
         self.ambient_channel.fadeout(2)
         self.character.reset()
+        for building in self.buildings:
+            for collectible in building.collectibles:
+                collectible.reset()
         self.camera = Coords(CHARACTER_START[X], CHARACTER_START[Y])
 
         self.fade_in_timer.start(MAIN_MENU_FADE_IN_TIME)

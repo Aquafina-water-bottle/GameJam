@@ -31,6 +31,9 @@ class Collectible(Sprite):
     def collides(self, character, camera):
         return not self.picked_up and character.proper_size.colliderect(self.get_relative(camera))
 
+    def reset(self):
+        self.picked_up = False
+
     @property
     def display_name(self):
         return Collectible.display_names[self.type]
