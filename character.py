@@ -198,6 +198,12 @@ class Character(Sprite):
                     image_pose = self.images["moving-down-right"]
         self.image = image_pose[self.pose.animation_index]
 
+    def has_no_items(self, *items):
+        for item in items:
+            if self.character.items[item] != 0:
+                return False
+        return True
+
     def get_rect_at_feet(self):
         # 4 pixels from main image
 

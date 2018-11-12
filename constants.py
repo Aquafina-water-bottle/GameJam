@@ -8,7 +8,7 @@ COLLIDES = 1
 # MAP_SIZE = (640*SCALE, 640*SCALE)
 # TOWN_SIZE = (1280, 1280)
 # TODO make borders at some point, probably doesn't need town size
-SCREEN_SIZE = (640, 640)
+SCREEN_SIZE = (840, 840)
 CHARACTER_START = (526*SCALE, 360*SCALE)
 
 RUNNING_ANIMATION_DELAY = 15

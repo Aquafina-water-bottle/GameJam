@@ -14,26 +14,22 @@ from user_input import UserInput
 
 """
 TODO (programming):
-
-- building mechanics:
-    - enter buildings:
-        - change background
-        - load in collectibles
-        - ability to exit building
-    - bitmask
-
-- ending collide with box feet
-
-- collectible mechanics:
-    - increment points to whatever
-
-- character animations
-
-- win condition
-    - math for collectibles
-    - areas for winning
-
 - get jared ssh lmao
+
+- win condition (discuss balancing)
+    - math for collectibles
+
+- fade in and out literally everything
+    - 
+
+- show ending and actually fade in and fade out ending
+- load sample image for beginning
+
+- pick up item: text
+- both exit and entering: text
+    - both show up for 1 second
+
+- well to get water
 """
 
 def main():
@@ -83,6 +79,8 @@ class Game:
         self.exit_button, self.exit_image = make_exit_button()
 
         self.ended = False
+        self.show_ending = False
+        self.end_image = None
         self.fade_out_begin = -1
         self.begin_time = None
 
@@ -151,13 +149,25 @@ class Game:
             self.clock.tick(60)
 
         if self.ended:
-            self.end()
+            self.get_end_image()
 
         return self.running
 
         if DEBUG:
             print("debug: temp =", self.temp)
             print("collected {}".format(self.character.items))
+
+    def begin_fade_in(self, fade_in_time):
+        self.fade_in_time = fade_in_time
+
+    def end_fade_in(self):
+        self.fade_in_time = -1
+
+    def begin_fade_out(self, fade_out_time):
+        self.fade_out_time = fade_out_time
+
+    def end_fade_out(self):
+        self.fade_out_time = -1
 
 
     def handle_event(self):
@@ -169,8 +179,8 @@ class Game:
                 self.ambient.play()
 
         if self.fade_out and time.time() - self.fade_out_begin > FADE_OUT_TIME:
-            # self.fade_out = False
-            self.ended = True
+            self.fade_out = False
+            self.show_ending = True
 
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
@@ -194,9 +204,15 @@ class Game:
     def beginning(self):
         self.screen.fill((0, 0, 0))
 
-
     def draw(self):
-        self.screen.fill((0, 0, 0))
+        if self.show_ending:
+            if self.end_image is None:
+                self.get_end_image()
+                self.end_image = pygame.transform.scale(self.end_image, SCREEN_SIZE)
+            self.screen.blit(self.end_image, (0, 0))
+            pygame.display.flip()
+            return
+
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
         # pygame.draw.rect(self.screen, color, self.character)
 
@@ -343,7 +359,7 @@ class Game:
                 self.paused = False
                 self.countdown.unpause()
             elif self.exit_button.collidepoint(pos):
-                self.ended = True
+                self.show_ending = True
                 self.paused = False
 
         if event.type == pygame.QUIT:
@@ -351,7 +367,20 @@ class Game:
             self.running = False
             self.paused = False
 
-    def end(self):
+    def get_end_image(self):
+        if sum(self.character.items.values()) < 2:
+            self.end_image = load_image("endings/missing_lots_death.png", return_rect=False)
+        elif self.character.has_no_items("filled_water_skin"):
+            self.end_image = load_image("endings/thirst_death.png", return_rect=False)
+        elif self.character.has_no_items("ugly_green_scarf"):
+            self.end_image = load_image("endings/cold_death.png", return_rect=False)
+        elif self.character.has_no_items("bread", "cheese", "jerky"):
+            self.end_image = load_image("endings/starvation_death.png", return_rect=False)
+        elif self.character.has_no_items("bandages", "bow_arrow", "cheese"):
+            self.end_image = load_image("endings/bandits_death.png", return_rect=False)
+        elif self.character.has_no_items("pileogold"):
+            self.end_image = load_image("endings/no_money_death.png", return_rect=False)
+
         print("ended!")
 
 
