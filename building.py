@@ -72,7 +72,8 @@ def create_buildings():
             background_png_name="weaver_house.png",
             name="the weaver's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150)
+                "water_skin1": Collectible("water_skin.png", 20, 150),
+                "bandages": Collectible("bandages.png", 37, 198),
             }),
             furniture={
                 "thread_thing1": pygame.Rect(70, 65, 18, 23),
@@ -102,7 +103,7 @@ def create_buildings():
         "other_house": Building(
             entrance=pygame.Rect(629, 500, 23, 8),
             background_png_name="other_house.png",
-            name="TODO we probably should name this lol",
+            name="the neighbour's house",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150)
             }),
@@ -136,7 +137,8 @@ def create_buildings():
             background_png_name="butcher_house.png",
             name="the butcher's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150)
+                "water_skin": Collectible("water_skin.png", 38, 84),
+                "jerky": Collectible("jerky.png", 19, 203),
             }),
             furniture={
                 "table1": pygame.Rect(17, 68, 36, 44),

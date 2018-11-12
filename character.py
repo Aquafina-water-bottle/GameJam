@@ -73,8 +73,7 @@ class Character(Sprite):
         self.rect.x = SCREEN_SIZE[X]//2 - self.rect.width//2
         self.rect.y = SCREEN_SIZE[Y]//2 - self.rect.height//2
 
-        self.weight = 0
-        self.points = 0
+        self.escaped = False
         self.items = {
             "bandages": 0,
             "bow_arrow": 0,
@@ -121,6 +120,7 @@ class Character(Sprite):
         #self.has_key_b = False
 
     def reset(self):
+        self.escaped = False
         self.pose = Pose()
         for key in self.items:
             self.items[key] = 0

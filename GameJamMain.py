@@ -37,6 +37,7 @@ class Game:
         # default font used for the timer
         self.font = pygame.font.Font(None, 100)
         self.subtext_font = pygame.font.Font(None, 25)
+        self.notification_font = pygame.font.Font(None, 25)
 
         # specifies the middle of the screen
         self.character = Character("avatar/MC-front.png", 0, 0)
@@ -58,7 +59,7 @@ class Game:
         self.ticker = Ticker()
         self.fade_in_timer = Timer()
         self.display_timer = Timer()
-        self.subtext_timer = Timer()
+        self.notification_timer = Timer()
         self.fade_out_timer = Timer()
 
         # define a variable to control the main loop
@@ -74,12 +75,13 @@ class Game:
 
         self.wins = create_wins()
         self.subtext_value = ""
+        self.notification_value = ""
 
         # self.ended = False
         # self.show_ending = False
 
         self.end_image = None
-        self.begin_image = load_image("begin_temp.png", use_scale=False, return_rect=False)
+        self.begin_image = load_image("beginlol.png", use_scale=False, return_rect=False)
         self.begin_image = pygame.transform.scale(self.begin_image, SCREEN_SIZE)
 
         self.default_background = load_image('background.png', return_rect=False)
@@ -90,7 +92,7 @@ class Game:
 
         # creates the start menus
         self.pause_menu = PauseMenu(self.screen)
-        self.main_menu = MainMenu(self.screen, self.background)
+        self.main_menu = MainMenu(self.screen)
 
         self.temp = []
 
@@ -226,13 +228,6 @@ class Game:
                     self.temp.append(coords)
             self.character.update(velocity, self.ticker.tick)
 
-            # detects collision with walls and buildings
-            pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
-            if pixel[3] > ALPHA_THRESHOLD:
-                # TODO move back character
-                self.camera.x = self.camera.previous_x
-                self.camera.y = self.camera.previous_y
-
             if not self.in_building:
                 # detects collision with walls and buildings
                 pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
@@ -243,31 +238,37 @@ class Game:
                         self.camera.y = self.camera.previous_y
 
                 # checks for collecting water at the well
-                if (self.well_area.collide(self.camera, self.character.proper_size)
-                        and self.user_input.clicked_interact(self.ticker.tick)
-                        and self.character.items["water_skin"] >= 1):
-                    self.character.items["water_skin"] -= 1
-                    self.character.items["filled_water_skin"] += 1
-                    self.subtext_value = "Filled your water skin"
-                    self.subtext_timer.start(SUBTEXT_TIME)
+                if (self.well_area.collide(self.camera, self.character.proper_size) and self.character.items["water_skin"] >= 1):
+                    self.subtext_value = "Press {} to fill your water skin".format(INTERACT_KEY)
+                    if self.user_input.clicked_interact(self.ticker.tick):
+                        self.character.items["water_skin"] -= 1
+                        self.character.items["filled_water_skin"] += 1
+                        self.notification_value = "Filled your water skin"
+                        self.notification_timer.start(NOTIFICATION_TIME)
 
                 # checks for the building shit
                 for building in self.buildings:
-                    if building.enters(self.character, self.camera) and self.user_input.clicked_interact(self.ticker.tick):
-                        self.subtext_value = "Entered " + building.name
-                        self.subtext_timer.start(SUBTEXT_TIME)
-                        self.current_building = building
-                        self.background = building.background
-                        self.camera_save = self.camera.copy()
+                    if building.enters(self.character, self.camera):
+                        self.subtext_value = "Press {} to enter ".format(INTERACT_KEY) + building.name
 
-                        # resets the camera
-                        building_exit_coords = building.camera_exit_coords
-                        building_exit_coords.y -= self.character.rect.height // 2
-                        self.camera = building_exit_coords
+                        if self.user_input.clicked_interact(self.ticker.tick):
+                            self.notification_value = "Entered " + building.name
+                            self.notification_timer.start(NOTIFICATION_TIME)
+
+                            self.current_building = building
+                            self.background = building.background
+                            self.camera_save = self.camera.copy()
+
+                            # resets the camera
+                            building_exit_coords = building.camera_exit_coords
+                            building_exit_coords.y -= self.character.rect.height // 2
+                            self.camera = building_exit_coords
 
                 # collides with any win
                 for win in self.wins:
                     if win.collide(self.camera, self.character.get_rect_at_feet()):
+                        # set player to escaped
+                        self.character.escaped = True
                         # ambient fades out only here
                         self.ambient_channel.fadeout(AMBIENT_FADE_OUT)
                         self.end()
@@ -292,21 +293,27 @@ class Game:
 
                 # checks for collectibles
                 for collectible in self.current_building.collectibles:
-                    if collectible.collides(self.character, self.camera) and self.user_input.clicked_interact(self.ticker.tick):
-                        self.subtext_value = "Collected " + collectible.pick_up()
-                        self.subtext_timer.start(SUBTEXT_TIME)
-                        self.character.items[collectible.type] += 1
-                        #self.character.points += collectible.points
-                        #self.character.weight += collectible.weight
+                    if collectible.collides(self.character, self.camera):
+                        self.subtext_value = "Collect " + collectible.display_name
+
+                        if self.user_input.clicked_interact(self.ticker.tick):
+                            collectible.pick_up()
+                            self.notification_value = "Collected " + collectible.display_name
+                            self.notification_timer.start(NOTIFICATION_TIME)
+                            self.character.items[collectible.type] += 1
+                            #self.character.points += collectible.points
+                            #self.character.weight += collectible.weight
 
                 # checks whether they have left the building
-                if (self.current_building.exit_area.collide(self.camera, self.character.get_rect_at_feet())
-                        and self.user_input.clicked_interact(self.ticker.tick)):
-                    self.subtext_value = "Left " + self.current_building.name
-                    self.subtext_timer.start(SUBTEXT_TIME)
-                    self.camera = self.camera_save
-                    self.current_building = None
-                    self.background = self.default_background
+                if self.current_building.exit_area.collide(self.camera, self.character.get_rect_at_feet()):
+                    self.subtext_value = "Press {} to leave ".format(INTERACT_KEY) + self.current_building.name
+
+                    if self.user_input.clicked_interact(self.ticker.tick):
+                        self.notification_value = "Left " + self.current_building.name
+                        self.notification_timer.start(NOTIFICATION_TIME)
+                        self.camera = self.camera_save
+                        self.current_building = None
+                        self.background = self.default_background
 
     def draw(self):
         self.screen.fill((0, 0, 0))
@@ -342,13 +349,22 @@ class Game:
 
             # renders the display name on the bottom right of the screen
             if self.subtext_value:
-                if self.subtext_timer.ended:
-                    self.subtext_value = ""
+                text_render = self.subtext_font.render(self.subtext_value, True, pygame.Color("orange"))
+                # text_render = pygame.transform.scale(text_render, (text_render.get_width()*3, text_render.get_height()*3))
+                text_pos = text_render.get_rect()
+                text_pos.bottomleft = self.screen.get_rect().bottomleft
+                self.screen.blit(text_render, text_pos)
+                self.subtext_value = ""
+
+            if self.notification_value:
+                if self.notification_timer.ended:
+                    self.notification_value = ""
                 else:
-                    text_render = self.subtext_font.render(self.subtext_value, True, pygame.Color("orange"))
+                    text_render = self.notification_font.render(self.notification_value, True, pygame.Color("orange"))
                     # text_render = pygame.transform.scale(text_render, (text_render.get_width()*3, text_render.get_height()*3))
                     text_pos = text_render.get_rect()
                     text_pos.bottomleft = self.screen.get_rect().bottomleft
+                    text_pos.y -= 25
                     self.screen.blit(text_render, text_pos)
 
         # displays the beginning image
@@ -419,7 +435,9 @@ class Game:
         self.fade_out_timer.start(GAME_FADE_OUT_TIME)
 
         # gets the end image
-        if sum(self.character.items.values()) < 2:
+        if not self.character.escaped:
+            self.end_image = load_image("endings/stay_death.png", return_rect=False)
+        elif sum(self.character.items.values()) <= 2:
             self.end_image = load_image("endings/missing_lots_death.png", return_rect=False)
         elif self.character.has_no_items("filled_water_skin"):
             self.end_image = load_image("endings/thirst_death.png", return_rect=False)
@@ -432,8 +450,7 @@ class Game:
         elif self.character.has_no_items("pileogold"):
             self.end_image = load_image("endings/no_money_death.png", return_rect=False)
         else:
-            # success?
-            pass
+            self.end_image = load_image("endings/win_happy.png", return_rect=False)
 
         self.end_image = pygame.transform.scale(self.end_image, SCREEN_SIZE)
 

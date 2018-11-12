@@ -27,8 +27,9 @@ class Button:
 
 
 class MainMenu:
-    def __init__(self, screen, background):
-        self.background = pygame.transform.scale(background.copy(), SCREEN_SIZE)
+    def __init__(self, screen):
+        self.background = load_image("START BACK.png", use_scale=False, return_rect=False)
+        self.background = pygame.transform.scale(self.background, SCREEN_SIZE)
         self.black_surface = create_black_surface(screen)
         self.black_surface.set_alpha(100)
         self.play_button = Button("StartButton.png", 0.3, 0.4, 0.4, 0.15, "orange")
