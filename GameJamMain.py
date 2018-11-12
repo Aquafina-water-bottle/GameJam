@@ -64,6 +64,7 @@ class Game:
         self.running = True
         self.continue_game = True
         self.ambient = pygame.mixer.Sound("assets/ambient.wav")
+        self.wind = pygame.mixer.Sound("assets/wind.wav")
         self.clock = pygame.time.Clock()
         self.countdown = Countdown()
 
@@ -138,6 +139,7 @@ class Game:
                 self.update()
             self.pause()
             self.clock.tick(60)
+        pygame.mixer.stop()
         return self.loop
 
         if DEBUG:
@@ -178,7 +180,14 @@ class Game:
             self.paused = True
             
     def beginning(self):
+        pygame.font.init()
+        Text = "The attack has come, you have one minute to grab as many supplies as you can and escape, good luck!"
+        words = self.font.render(Text, True, pygame.Color("White"))
         self.screen.fill((0, 0, 0))
+        self.screen.blit(words, (0,0))
+        pygame.display.flip()
+        time.sleep(5)
+        pygame.mixer.stop()
 
 
     def draw(self):
@@ -310,7 +319,9 @@ class Game:
         self.countdown.stop()
 
     def pause(self):
-        self.countdown.pause()
+        if self.paused:
+            pygame.mixer.pause()
+            self.countdown.pause()
         while self.paused:
             self.draw()
             black_surface = self.screen.copy()
@@ -355,6 +366,7 @@ class Game:
             if play_button.collidepoint(pos):
                 self.paused = False
                 self.countdown.unpause()
+                pygame.mixer.unpause()
             elif exit_button.collidepoint(pos):
                 self.ended = True
                 self.paused = False
