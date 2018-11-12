@@ -341,6 +341,7 @@ class Game:
             pos = pygame.mouse.get_pos()
             if self.play_button.collidepoint(pos):
                 self.paused = False
+                self.countdown.unpause()
             elif self.exit_button.collidepoint(pos):
                 self.ended = True
                 self.paused = False
