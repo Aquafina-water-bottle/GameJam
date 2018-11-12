@@ -310,7 +310,7 @@ class Game:
         self.countdown.stop()
 
     def pause(self):
-        self.user_input.update()
+        self.countdown.pause()
         while self.paused:
             self.draw()
             black_surface = self.screen.copy()
@@ -354,6 +354,7 @@ class Game:
             pos = pygame.mouse.get_pos()
             if play_button.collidepoint(pos):
                 self.paused = False
+                self.countdown.unpause()
             elif exit_button.collidepoint(pos):
                 self.ended = True
                 self.paused = False
@@ -362,9 +363,6 @@ class Game:
             self.running = False
             self.loop = False
             self.paused = False
-        if self.user_input.pause():
-            self.paused = False
-
         
 
 

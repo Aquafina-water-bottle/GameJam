@@ -10,6 +10,7 @@ class Countdown:
         self.stopped = False
         self.storage = -1
         self._tick = 0
+        self.paused_time = 0
 
     def start(self):
         self.started = True
@@ -34,8 +35,8 @@ class Countdown:
         if self.stopped:
             return self.storage
         current_time = time.time()
-        countdown = COUNTDOWN_START - (current_time - self.beginning_time)
-        return countdown
+        self.countdown = COUNTDOWN_START - (current_time - self.beginning_time)
+        return self.countdown
 
     def draw(self, screen, font, fade_in):
         # countdown = round(get_countdown(), 2)
@@ -52,6 +53,12 @@ class Countdown:
         text_pos = text_render.get_rect()
         text_pos.topright = screen.get_rect().topright
         screen.blit(text_render, text_pos)
+
+    def pause(self):
+        self.paused_time = time.time()
+
+    def unpause(self):
+        self.beginning_time += time.time() - self.paused_time
 
 
 
