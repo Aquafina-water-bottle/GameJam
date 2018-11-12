@@ -3,16 +3,14 @@ import os
 import time
 import pygame
 
+from constants import *
 from MainMenu import MainMenu
 from win import create_wins
-from constants import *
 from countdown import Countdown
 from building import create_buildings
 from character import Character
 from general import load_image, Coords
 from user_input import UserInput
-
-begin_time = time.time()
 
 """
 TODO (programming):
@@ -82,6 +80,7 @@ class Game:
 
         self.ended = False
         self.fade_out_begin = -1
+        self.begin_time = None
 
         # specifies the middle of the screen
         self.character = Character("avatar/MC-front.png", 0, 0)
@@ -130,6 +129,10 @@ class Game:
         return self.current_building is not None
 
     def play(self):
+        self.begin_time = time.time()
+        self.ended = False
+        self.fade_in = True
+
         while self.running and not self.ended:
             self.user_input.update()
             self.countdown.update()
@@ -138,7 +141,9 @@ class Game:
 
             if self.continue_game and not self.fade_in:
                 self.update()
-            self.pause()
+
+            while self.paused:
+                self.pause()
             self.clock.tick(60)
 
         if DEBUG:
@@ -148,7 +153,7 @@ class Game:
 
     def handle_event(self):
         # checks if fading has end
-        if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
+        if self.fade_in and time.time() - self.begin_time > FADE_IN_TIME:
             self.fade_in = False
             self.countdown.start()
             if not DEBUG:
@@ -174,9 +179,9 @@ class Game:
         if self.user_input.clicked_quit():
             self.running = False
 
-        if self.user_input.pause():
+        if self.user_input.clicked_pause():
+            self.countdown.pause()
             self.paused = True
-
 
 
     def draw(self):
@@ -215,7 +220,7 @@ class Game:
 
         if self.fade_in:
             # where alpha_value decreases from 255 to 0
-            alpha_value = int(255 - 255 * (time.time() - begin_time) / FADE_IN_TIME)
+            alpha_value = int(255 - 255 * (time.time() - self.begin_time) / FADE_IN_TIME)
             black_fade_surface = self.screen.copy()
             black_fade_surface.fill(pygame.Color("black"))
             black_fade_surface.set_alpha(alpha_value)
@@ -228,6 +233,7 @@ class Game:
             black_fade_surface.fill(pygame.Color("black"))
             black_fade_surface.set_alpha(alpha_value)
             self.screen.blit(black_fade_surface, (0, 0))
+
         if not self.paused:
             pygame.display.flip()
 
@@ -308,20 +314,19 @@ class Game:
         self.countdown.stop()
 
     def pause(self):
-        while self.paused:
-            self.draw()
-            black_surface = self.screen.copy()
-            black_surface.fill(pygame.Color("black"))
-            black_surface.set_alpha(100)
-            self.screen.blit(black_surface, (0,0))
-            play_button, play_image, play_x, play_y = self.make_continue_button()
-            exit_button, exit_image, exit_x, exit_y = self.make_exit_button()
-            pygame.draw.rect(self.screen, pygame.Color("orange"), play_button)
-            self.screen.blit(play_image, (play_x, play_y))
-            pygame.draw.rect(self.screen, pygame.Color("orange"), exit_button)
-            self.screen.blit(exit_image, (exit_x, exit_y))
-            pygame.display.flip()
-            self.pause_input(play_button, exit_button)
+        self.draw()
+        black_surface = self.screen.copy()
+        black_surface.fill(pygame.Color("black"))
+        black_surface.set_alpha(100)
+        self.screen.blit(black_surface, (0,0))
+        play_button, play_image, play_x, play_y = self.make_continue_button()
+        exit_button, exit_image, exit_x, exit_y = self.make_exit_button()
+        pygame.draw.rect(self.screen, pygame.Color("orange"), play_button)
+        self.screen.blit(play_image, (play_x, play_y))
+        pygame.draw.rect(self.screen, pygame.Color("orange"), exit_button)
+        self.screen.blit(exit_image, (exit_x, exit_y))
+        pygame.display.flip()
+        self.pause_input(play_button, exit_button)
 
     def make_continue_button(self):
         play_image = pygame.image.load(os.path.join('assets/Resumebutton.png'))
@@ -352,7 +357,6 @@ class Game:
             if play_button.collidepoint(pos):
                 self.paused = False
             elif exit_button.collidepoint(pos):
-                print("argh")
                 self.ended = True
                 self.paused = False
 

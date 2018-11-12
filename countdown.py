@@ -5,17 +5,30 @@ from constants import *
 
 class Countdown:
     def __init__(self):
-        self.beginning_time = 0
-        self.started = False
-        self.stopped = False
-        self.storage = -1
+        self.time_increment = 0
+        self.pause_storage = -1
+        self.stop_storage = -1
+        self.beginning_time = -1
         self._tick = 0
+
+        # self.beginning_time = 0
+        # self.started = False
+        # self.stopped = False
 
     def start(self):
         self.started = True
         self.beginning_time = time.time()
 
+    def unpause(self):
+        self.beginning_time = time.time() - self.pause_storage
+        self.pause_storage = -1
+
+    def pause(self):
+        self.pause_storage = self.beginning_time
+        self.beginning_time = -1
+
     def stop(self):
+        self.stop_storage = self.get()
         self.storage = self.get()
         self.stopped = True
 
@@ -29,6 +42,10 @@ class Countdown:
         tick shouldn't be set m29
         """
         return self._tick
+
+    @property
+    def stopped(self):
+        return self.stop_storage != -1
 
     def get(self):
         if self.stopped:
