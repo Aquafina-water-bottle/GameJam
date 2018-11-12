@@ -17,6 +17,10 @@ class UserInput:
 
     def update(self):
         self.pressed = pygame.key.get_pressed()
+        self.event = pygame.event.poll()
+
+    def clicked_mouse(self):
+        return self.event.type == pygame.MOUSEBUTTONUP and self.event.button == 1
 
     def clicked_quit(self):
         return self.pressed[K_q]

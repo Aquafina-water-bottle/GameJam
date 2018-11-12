@@ -37,27 +37,28 @@ TODO (programming):
 """
 
 def main():
-    loop = True
+    running = True
     pygame.init()
     pygame.display.set_caption("Escape The Village")
 
-        # create a surface on screen that has the size of 240 x 180144
-        # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)entrance
+    # create a surface on screen that has the size of 240 x 180144
+    # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)entrance
     screen = pygame.display.set_mode(SCREEN_SIZE)
     mainMenu = MainMenu(screen, SCREEN_SIZE)
-    while loop:
+
+    while running:
         mainMenu = MainMenu(screen, SCREEN_SIZE)
-        game = Game(screen, loop)
+        game = Game(screen)
         if mainMenu.play():
-            loop = game.play()
+            running = game.play()
         else:
-            loop = False
+            running = False
 
 class Game:
-    def __init__(self, screen, loop):
+    def __init__(self, screen):
         # initialize the pygame module
         self.screen = screen
-        self.loop = loop
+        self.loop = True
         self.font = pygame.font.Font(None, 100)
 
         # define a variable to control the main loop
@@ -76,6 +77,10 @@ class Game:
         self.in_building_exit = False
 
         self.wins = create_wins()
+
+        # creates the play and exit buttons
+        self.play_button, self.play_image = make_continue_button()
+        self.exit_button, self.exit_image = make_exit_button()
 
         self.ended = False
         self.fade_out_begin = -1
@@ -138,17 +143,20 @@ class Game:
             self.handle_event()
             self.draw()
 
-            if self.continue_game and not self.fade_in:
+            if self.paused:
+                self.pause_update()
+            elif self.continue_game and not self.fade_in:
                 self.update()
 
-            while self.paused:
-                self.pause()
             self.clock.tick(60)
-        return self.loop
+
+        if self.ended:
+            self.end()
+
+        return self.running
 
         if DEBUG:
             print("debug: temp =", self.temp)
-
             print("collected {}".format(self.character.items))
 
 
@@ -163,7 +171,6 @@ class Game:
         if self.fade_out and time.time() - self.fade_out_begin > FADE_OUT_TIME:
             # self.fade_out = False
             self.ended = True
-            print("ended?")
 
         # event handling, gets all event from the eventqueue
         event = pygame.event.poll()
@@ -171,7 +178,6 @@ class Game:
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             self.running = False
-            self.loop = False
 
         # checks if the countdown ends
         if not self.fade_in and not self.fade_out and self.countdown.get() <= 0:
@@ -239,8 +245,19 @@ class Game:
             black_fade_surface.set_alpha(alpha_value)
             self.screen.blit(black_fade_surface, (0, 0))
 
-        if not self.paused:
-            pygame.display.flip()
+        if self.paused:
+            # creates the dark shadow
+            black_surface = self.screen.copy()
+            black_surface.fill(pygame.Color("black"))
+            black_surface.set_alpha(100)
+            self.screen.blit(black_surface, (0, 0))
+
+            pygame.draw.rect(self.screen, pygame.Color("orange"), self.play_button)
+            self.screen.blit(self.play_image, (self.play_button.x, self.play_button.y))
+            pygame.draw.rect(self.screen, pygame.Color("orange"), self.exit_button)
+            self.screen.blit(self.exit_image, (self.exit_button.x, self.exit_button.y))
+
+        pygame.display.flip()
 
     def update(self):
         velocity = self.user_input.get_velocity()
@@ -318,61 +335,51 @@ class Game:
         self.fade_out_begin = time.time()
         self.countdown.stop()
 
-    def pause(self):
-        self.user_input.update()
-        self.draw()
-        black_surface = self.screen.copy()
-        black_surface.fill(pygame.Color("black"))
-        black_surface.set_alpha(100)
-        self.screen.blit(black_surface, (0,0))
-        play_button, play_image, play_x, play_y = self.make_continue_button()
-        exit_button, exit_image, exit_x, exit_y = self.make_exit_button()
-        pygame.draw.rect(self.screen, pygame.Color("orange"), play_button)
-        self.screen.blit(play_image, (play_x, play_y))
-        pygame.draw.rect(self.screen, pygame.Color("orange"), exit_button)
-        self.screen.blit(exit_image, (exit_x, exit_y))
-        pygame.display.flip()
-        self.pause_input(play_button, exit_button)
-
-    def make_continue_button(self):
-        play_image = pygame.image.load(os.path.join('assets/Resumebutton.png'))
-        x = SCREEN_SIZE[0]
-        y = SCREEN_SIZE[1]
-        play_x = int(x * 0.3)
-        play_width = int(x * 0.4)
-        play_y = int(y * 0.4)
-        play_height = int(y * 0.15)
-        play_image = pygame.transform.scale(play_image, (play_width, play_height))
-        return pygame.Rect(play_x, play_y, play_width, play_height), play_image, play_x, play_y
-
-    def make_exit_button(self):
-        exit_image = pygame.image.load(os.path.join('assets/quit button .png'))
-        x = SCREEN_SIZE[0]
-        y = SCREEN_SIZE[1]
-        exit_x = int(x * 0.3)
-        exit_width = int(x * 0.4)
-        exit_y = int(y * 0.57)
-        exit_height = int(y * 0.15)
-        exit_image = pygame.transform.scale(exit_image, (exit_width, exit_height))
-        return pygame.Rect(exit_x, exit_y, exit_width, exit_height), exit_image, exit_x, exit_y
-
-    def pause_input(self, play_button, exit_button):
+    def pause_update(self):
         event = pygame.event.poll()
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             pos = pygame.mouse.get_pos()
-            if play_button.collidepoint(pos):
+            if self.play_button.collidepoint(pos):
                 self.paused = False
-            elif exit_button.collidepoint(pos):
+            elif self.exit_button.collidepoint(pos):
                 self.ended = True
                 self.paused = False
 
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             self.running = False
-            self.loop = False
             self.paused = False
-        if self.user_input.pause():
-            self.paused = False
+
+    def end(self):
+        print("ended!")
+
+
+def make_exit_button():
+    exit_image = load_image("QuitButton.png", use_scale=True, return_rect=False)
+
+    x = SCREEN_SIZE[0]
+    y = SCREEN_SIZE[1]
+    exit_x = int(x * 0.3)
+    exit_width = int(x * 0.4)
+    exit_y = int(y * 0.57)
+    exit_height = int(y * 0.15)
+    exit_image = pygame.transform.scale(exit_image, (exit_width, exit_height))
+
+    return pygame.Rect(exit_x, exit_y, exit_width, exit_height), exit_image
+
+
+def make_continue_button():
+    play_image = load_image("Resumebutton.png", use_scale=True, return_rect=False)
+
+    x = SCREEN_SIZE[0]
+    y = SCREEN_SIZE[1]
+    play_x = int(x * 0.3)
+    play_width = int(x * 0.4)
+    play_y = int(y * 0.4)
+    play_height = int(y * 0.15)
+    play_image = pygame.transform.scale(play_image, (play_width, play_height))
+
+    return pygame.Rect(play_x, play_y, play_width, play_height), play_image
 
 
 # run the main function only if this module is executed as the main script

@@ -50,7 +50,7 @@ class MainMenu:
 
 
     def make_play_button(self):
-        play_image = pygame.image.load(os.path.join('assets/start button .png'))
+        play_image = pygame.image.load(os.path.join('assets/StartButton.png'))
         x = self.SCREEN_SIZE[0]
         y = self.SCREEN_SIZE[1]
         play_x = int(x * 0.3)
@@ -61,7 +61,7 @@ class MainMenu:
         return pygame.Rect(play_x, play_y, play_width, play_height), play_image, play_x, play_y
 
     def make_exit_button(self):
-        exit_image = pygame.image.load(os.path.join('assets/quit button .png'))
+        exit_image = pygame.image.load(os.path.join('assets/QuitButton.png'))
         x = self.SCREEN_SIZE[0]
         y = self.SCREEN_SIZE[1]
         exit_x = int(x * 0.3)
