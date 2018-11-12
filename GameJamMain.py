@@ -415,7 +415,7 @@ class Game:
         if not self.countdown.ended:
             self.countdown.pause()
         self.state = GAME_FADE_OUT
-        self.fade_out_timer.start(END_FADE_IN_TIME)
+        self.fade_out_timer.start(GAME_FADE_OUT_TIME)
 
         # gets the end image
         if sum(self.character.items.values()) < 2:
