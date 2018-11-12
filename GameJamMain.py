@@ -239,8 +239,24 @@ class Game:
                 if pixel[3] > ALPHA_THRESHOLD:
                     # TODO make less sticky if possible
                     if COLLIDES:
+                        # checks for each x and y if they can work
+                        current_x = self.camera.x
+                        current_y = self.camera.y
+
                         self.camera.x = self.camera.previous_x
                         self.camera.y = self.camera.previous_y
+
+                        coords = Coords(current_x, current_y)
+                        coords.x = self.camera.previous_x       # gets the new y coordinate and keeps x constant
+                        pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(coords))))
+                        if not (pixel[3] > ALPHA_THRESHOLD):    # if the new y coordinate is free
+                            self.camera.y = coords.y
+
+                        coords = Coords(current_x, current_y)
+                        coords.y = self.camera.previous_y
+                        pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(coords))))
+                        if not pixel[3] > ALPHA_THRESHOLD:
+                            self.camera.x = coords.x
 
                 # checks for collecting water at the well
                 if (self.well_area.collide(self.camera, self.character.proper_size) and self.character.items["water_skin"] >= 1):
@@ -284,17 +300,47 @@ class Game:
                 coords = tuple(self.character.get_pixel_at_feet(self.camera))
                 if not self.current_building.walls.rect.collidepoint(coords):
                     # TODO make less sticky if possible
+
                     if COLLIDES:
+                        # checks for each x and y if they can work
+                        current_x = self.camera.x
+                        current_y = self.camera.y
+
                         self.camera.x = self.camera.previous_x
                         self.camera.y = self.camera.previous_y
 
-                # detects collision for furinture
+                        coords2 = Coords(current_x, current_y)
+                        coords2.x = self.camera.previous_x       # gets the new y coordinate and keeps x constant
+                        if self.current_building.walls.rect.collidepoint(tuple(self.character.get_pixel_at_feet(coords2))):
+                            self.camera.y = coords2.y
+
+                        coords2 = Coords(current_x, current_y)
+                        coords2.y = self.camera.previous_y
+                        if self.current_building.walls.rect.collidepoint(tuple(self.character.get_pixel_at_feet(coords2))):
+                            self.camera.x = coords2.x
+
+                # detects collision for furniture
                 for furniture in self.current_building.furniture.values():
                     if furniture.rect.collidepoint(coords):
                         # TODO make less sticky if possible
                         if COLLIDES:
+                            # checks for each x and y if they can work
+                            current_x = self.camera.x
+                            current_y = self.camera.y
+
                             self.camera.x = self.camera.previous_x
                             self.camera.y = self.camera.previous_y
+
+                            coords2 = Coords(current_x, current_y)
+                            coords2.x = self.camera.previous_x       # gets the new y coordinate and keeps x constant
+                            if not furniture.rect.collidepoint(tuple(self.character.get_pixel_at_feet(coords2))):
+                                self.camera.y = coords2.y
+
+                            coords2 = Coords(current_x, current_y)
+                            coords2.y = self.camera.previous_y
+                            if not furniture.rect.collidepoint(tuple(self.character.get_pixel_at_feet(coords2))):
+                                self.camera.x = coords2.x
+
 
                 # checks for collectibles
                 for collectible in self.current_building.collectibles:

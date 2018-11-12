@@ -52,8 +52,8 @@ class Building:
         pygame.draw.rect(screen, pygame.Color("orange"), relative_position)
 
     def debug_draw_inner(self, screen, camera):
-        # relative_position = get_relative(self.walls.rect, camera)
-        # pygame.draw.rect(screen, pygame.Color("red"), relative_position)
+        relative_position = get_relative(self.walls.rect, camera)
+        pygame.draw.rect(screen, pygame.Color("red"), relative_position)
 
         for furniture in self.furniture.values():
             relative_position = get_relative(furniture.rect, camera)
