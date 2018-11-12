@@ -116,13 +116,18 @@ class Game:
         self.user_input.update()
         self.ticker.update()
 
-        # checks for pause menu clicks
-        if self.state == GAME_PAUSE and self.user_input.clicked_mouse():
-            pos = pygame.mouse.get_pos()
-            if self.pause_menu.resume_button.border.collidepoint(pos):
+        # can only pause when you're in the fucking game matey lmao
+        if self.state == GAME_PLAY and self.user_input.clicked_pause(self.ticker.tick):
+            self.pause()
+        elif self.state == GAME_PAUSE:
+            if self.user_input.clicked_mouse():
+                pos = pygame.mouse.get_pos()
+                if self.pause_menu.resume_button.border.collidepoint(pos):
+                    self.unpause()
+                if self.pause_menu.exit_button.border.collidepoint(pos):
+                    self.running = False
+            if self.user_input.clicked_pause(self.ticker.tick):
                 self.unpause()
-            if self.pause_menu.exit_button.border.collidepoint(pos):
-                self.running = False
 
         # checks for main menu clicks
         if self.state == MAIN_MENU:
@@ -141,10 +146,6 @@ class Game:
             # change the value to False, to exit the main loop
             self.running = False
             return
-
-        # can only pause when you're in the fucking game matey lmao
-        if self.state == GAME_PLAY and self.user_input.clicked_pause(self.ticker.tick):
-            self.pause()
 
         # if the player presses interact and it's during one of the display screens
         if self.user_input.clicked_interact(self.ticker.tick):
