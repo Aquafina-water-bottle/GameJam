@@ -20,6 +20,11 @@ def scale_surface(surface):
     new_resolution = (surface.get_width()*SCALE, surface.get_height()*SCALE)
     return pygame.transform.scale(surface, new_resolution)
 
+def create_black_surface(screen):
+    black_surface = screen.copy()
+    black_surface.fill(pygame.Color("black"))
+    return black_surface
+
 def load_image(name, convert_alpha=False, use_scale=True, flip=False, return_rect=True):
     png_name = os.path.join('assets', name)
     image = pygame.image.load(png_name)

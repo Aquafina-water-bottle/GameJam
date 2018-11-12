@@ -3,26 +3,34 @@ import pygame
 
 from constants import *
 
+# countdown state
+CDS_STARTED = 0
+CDS_PAUSED = 1
+CDS_STOPPED = 2
+
 class Countdown:
     def __init__(self):
         self.beginning_time = 0
-        self.started = False
-        self.stopped = False
+        self.state = CDS_STOPPED
         self.storage = -1
         self._tick = 0
         self.paused_time = 0
 
     def start(self):
-        self.started = True
+        self.state = CDS_STARTED
         self.beginning_time = time.time()
 
     def stop(self):
         self.storage = self.get()
-        self.stopped = True
+        self.state = CDS_STOPPED
 
     def update(self):
-        if self.started:
+        if self.state == CDS_STARTED:
             self._tick += 1
+
+    @property
+    def ends(self):
+        return self.get() <= 0
 
     @property
     def tick(self):
@@ -32,18 +40,19 @@ class Countdown:
         return self._tick
 
     def get(self):
-        if self.stopped:
+        """
+        decrements from 60 to 0
+        """
+        if self.state in (CDS_STOPPED, CDS_PAUSED):
             return self.storage
         current_time = time.time()
         self.countdown = COUNTDOWN_START - (current_time - self.beginning_time)
         return self.countdown
 
-    def draw(self, screen, font, fade_in):
+    def draw(self, screen, font):
         # countdown = round(get_countdown(), 2)
 
-        if fade_in:
-            countdown = COUNTDOWN_START
-        elif self.get() < 0:
+        if self.get() < 0:
             countdown = 0
         else:
             countdown = int(self.get()) + 1
@@ -56,9 +65,12 @@ class Countdown:
 
     def pause(self):
         self.paused_time = time.time()
+        self.storage = self.get()
+        self.state = CDS_PAUSED
 
     def unpause(self):
         self.beginning_time += time.time() - self.paused_time
+        self.state = CDS_STARTED
 
 
 

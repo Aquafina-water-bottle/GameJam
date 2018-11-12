@@ -69,6 +69,10 @@ class PoseImages:
 class Character(Sprite):
     def __init__(self, png_name, x, y):
         super().__init__(png_name, x, y, convert_alpha=True)
+        # overrides the x and y rect values lmao
+        self.rect.x = SCREEN_SIZE[X]//2 - self.rect.width//2
+        self.rect.y = SCREEN_SIZE[Y]//2 - self.rect.height//2
+
         self.weight = 0
         self.points = 0
         self.items = {

@@ -1,14 +1,16 @@
-import pygame
 import os
 
+import pygame
+
+from constants import *
+from general import load_image, create_black_surface
+
 class MainMenu:
-    def __init__(self, screen, SCREEN_SIZE):
+    def __init__(self, screen):
         self.screen = screen
-        self.SCREEN_SIZE = SCREEN_SIZE
-        self.background = pygame.image.load(os.path.join('assets/background.png'))
+        self.background = load_image("background.png", use_scale=False, return_rect=False)
         self.background = pygame.transform.scale(self.background, (SCREEN_SIZE))
-        self.black_surface = self.screen.copy()
-        self.black_surface.fill(pygame.Color("black"))
+        self.black_surface = create_black_surface(screen)
         self.black_surface.set_alpha(100)
         self.running = True
         self.play_selected = False
@@ -51,8 +53,8 @@ class MainMenu:
 
     def make_play_button(self):
         play_image = pygame.image.load(os.path.join('assets/StartButton.png'))
-        x = self.SCREEN_SIZE[0]
-        y = self.SCREEN_SIZE[1]
+        x = SCREEN_SIZE[0]
+        y = SCREEN_SIZE[1]
         play_x = int(x * 0.3)
         play_width = int(x * 0.4)
         play_y = int(y * 0.4)
@@ -62,8 +64,8 @@ class MainMenu:
 
     def make_exit_button(self):
         exit_image = pygame.image.load(os.path.join('assets/QuitButton.png'))
-        x = self.SCREEN_SIZE[0]
-        y = self.SCREEN_SIZE[1]
+        x = SCREEN_SIZE[0]
+        y = SCREEN_SIZE[1]
         exit_x = int(x * 0.3)
         exit_width = int(x * 0.4)
         exit_y = int(y * 0.57)

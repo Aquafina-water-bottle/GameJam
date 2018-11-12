@@ -23,7 +23,7 @@ class UserInput:
         return self.event.type == pygame.MOUSEBUTTONUP and self.event.button == 1
 
     def clicked_quit(self):
-        return self.pressed[K_q]
+        return self.pressed[K_q] or self.event.type == pygame.QUIT
 
     def clicked_pause(self):
         return self.pressed[K_ESCAPE] or self.pressed[K_p]
@@ -66,6 +66,7 @@ class UserInput:
 
         # already calculated in the same frame
         if tick == self.storage_tick:
+            print("CLICKED")
             return True
 
         # so that interact can be pressed once and not held down
@@ -74,6 +75,7 @@ class UserInput:
             if not self.holding_interact:
                 self.holding_interact = True
                 self.storage_tick = tick
+                print("CLICKED")
                 return True
         else:
             self.holding_interact = False
