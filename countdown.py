@@ -1,7 +1,7 @@
 import time
 import pygame
 
-COUNTDOWN_START = 60
+from constants import *
 
 class Countdown:
     def __init__(self):
@@ -48,7 +48,7 @@ class Countdown:
             countdown = int(self.get()) + 1
 
         rendered_line = str(countdown)
-        text_render = font.render(rendered_line, True, pygame.Color("black"))
+        text_render = font.render(rendered_line, True, pygame.Color("orange"))
         text_pos = text_render.get_rect()
         text_pos.topright = screen.get_rect().topright
         screen.blit(text_render, text_pos)

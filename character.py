@@ -62,25 +62,12 @@ class Pose:
 
 class PoseImages:
     def __init__(self, *png_names, flip=False):
-        self.frames = tuple(load_image(png_name, convert_alpha=True, flip=flip, return_rect=False) for png_name in png_names)
+        self.frames = tuple(load_image("avatar/MC-" + png_name, convert_alpha=True, flip=flip, return_rect=False) for png_name in png_names)
 
     def __getitem__(self, index):
         return self.frames[index]
 
 class Character(Sprite):
-    """
-    MC-Back-for-Lup.png
-    MC-Back-for-Rup.png
-    MC-Back-Lup.png
-    MC-Back-Rup.png
-    MC-Back.png
-
-    MC-front-for-Lup.png
-    MC-front-for-Rup.png
-    MC-front-Lup.png
-    MC-front-Rup.png
-    MC-front.png
-    """
 
     def __init__(self, png_name, x, y):
         super().__init__(png_name, x, y, convert_alpha=True)
@@ -98,18 +85,18 @@ class Character(Sprite):
 
         # prerenders all images
         self.images = {
-            "standing-face-down-right": PoseImages("MC-front.png", flip=True),
-            "standing-face-up-right": PoseImages("MC-Back.png", flip=True),
-            "standing-face-down-left": PoseImages("MC-front.png"),
-            "standing-face-up-left": PoseImages("MC-Back.png"),
+            "standing-face-down-right": PoseImages("front.png", flip=True),
+            "standing-face-up-right": PoseImages("Back.png", flip=True),
+            "standing-face-down-left": PoseImages("front.png"),
+            "standing-face-up-left": PoseImages("Back.png"),
 
-            "moving-up-right": PoseImages("MC-front-Lup.png", "MC-front-Rup.png", flip=True),
-            "moving-up": PoseImages("MC-front-for-Lup.png", "MC-front-for-Rup.png"),
-            "moving-up-left": PoseImages("MC-front-Lup.png", "MC-front-Rup.png"),
+            "moving-up-right": PoseImages("front-Lup.png", "front-Rup.png", flip=True),
+            "moving-up": PoseImages("front-for-Lup.png", "front-for-Rup.png"),
+            "moving-up-left": PoseImages("front-Lup.png", "front-Rup.png"),
 
-            "moving-down-right": PoseImages("MC-Back-Lup.png", "MC-Back-Rup.png", flip=True),
-            "moving-down": PoseImages("MC-Back-for-Lup.png", "MC-Back-for-Rup.png"),
-            "moving-down-left": PoseImages("MC-Back-Lup.png", "MC-Back-Rup.png"),
+            "moving-down-right": PoseImages("Back-Lup.png", "Back-Rup.png", flip=True),
+            "moving-down": PoseImages("Back-for-Lup.png", "Back-for-Rup.png"),
+            "moving-down-left": PoseImages("Back-Lup.png", "Back-Rup.png"),
         }
 
         # for specific inventory items
@@ -185,14 +172,16 @@ class Character(Sprite):
                     image_pose = self.images["moving-down-right"]
         self.image = image_pose[self.pose.animation_index]
 
-    def get_rect_at_feet(self, camera):
+    def get_rect_at_feet(self):
         # 4 pixels from main image
-        height = (4*SCALE)
-        relative_rect = get_relative(self.rect, camera)
 
-        x = relative_rect.x
-        y = relative_rect.y + (self.rect.height // 2 - height)
-        return pygame.Rect(x, y, self.rect.width, height)
+        width = self.rect.width - FEET_WIDTH_REMOVE_SIDES*SCALE*2
+        height = (FEET_HEIGHT*SCALE)
+
+        x = self.rect.x + FEET_WIDTH_REMOVE_SIDES*SCALE
+        y = self.rect.y + (self.rect.height - height)
+
+        return pygame.Rect(x, y, width, height)
 
     def get_pixel_at_feet(self, camera):
         # relative_rect = get_relative(self.rect, camera)

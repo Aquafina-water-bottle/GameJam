@@ -39,8 +39,8 @@ class Sprite(pygame.sprite.Sprite):
         self.image, self.rect = load_image(png_name, convert_alpha)
         super().__init__()
 
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = x*SCALE
+        self.rect.y = y*SCALE
 
     def get_relative(self, camera):
         relative_position = self.rect.copy()

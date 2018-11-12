@@ -13,6 +13,9 @@ def get_relative(rect, camera):
     relative_position.y += SCREEN_SIZE[Y] // 2 - camera.y
     return relative_position
 
+def scale_rect(rect):
+    return pygame.Rect(rect.x*SCALE, rect.y*SCALE, rect.width*SCALE, rect.height*SCALE)
+
 def scale_surface(surface):
     new_resolution = (surface.get_width()*SCALE, surface.get_height()*SCALE)
     return pygame.transform.scale(surface, new_resolution)

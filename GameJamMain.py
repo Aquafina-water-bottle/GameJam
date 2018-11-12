@@ -3,13 +3,12 @@ import os
 import time
 
 import pygame
-from win import Win
+from win import create_wins
 from constants import *
 from countdown import Countdown
-from collectibles import create_collectibles
 from building import create_buildings
 from character import Character
-from general import load_image, scale_surface, Coords
+from general import load_image, Coords
 from user_input import UserInput
 
 begin_time = time.time()
@@ -58,18 +57,22 @@ class Game:
         self.ambient = pygame.mixer.Sound("assets/ambient.wav")
         self.clock = pygame.time.Clock()
         self.countdown = Countdown()
-        self.wins = []
-        self.wins.append(Win(200 * SCALE, 280 * SCALE, 40 * SCALE, 20 * SCALE))
-        self.wins.append(Win(400 * SCALE, 200 * SCALE, 60 * SCALE, 40 * SCALE))
-        self.wins.append(Win(610 * SCALE, 330 * SCALE, 60 * SCALE, 20 * SCALE))
 
-        self.collectibles = create_collectibles()
         self.buildings = create_buildings()
+
+        # in_building_entrance for exterior
+        self.in_building_entrance = False
+
+        # in_building_exit for interior
+        self.in_building_exit = False
+
+        self.wins = create_wins()
+
         self.ended = False
         self.fade_out_begin = -1
 
         # specifies the middle of the screen
-        self.character = Character("MC-front.png", 0, 0)
+        self.character = Character("avatar/MC-front.png", 0, 0)
         self.character.rect.x = SCREEN_SIZE[X]//2 - self.character.rect.width//2
         self.character.rect.y = SCREEN_SIZE[Y]//2 - self.character.rect.height//2
 
@@ -83,7 +86,7 @@ class Game:
         # temporarily transforms the background to the current resolution
         self.default_background = load_image('BACKROUND.png', return_rect=False)
 
-        self.building_wall_mask = load_image('background_outline3.png', convert_alpha=True, return_rect=False)
+        self.building_wall_mask = load_image('background_outline.png', convert_alpha=True, return_rect=False)
         # self.building_wall_mask = pygame.mask.from_surface(walls)
 
         # character mask is a literal constant one pixel at the base of the
@@ -94,10 +97,12 @@ class Game:
         #self.background = self.building_wall_mask
 
         # variables for when you're in some building
-        self.in_building = False
         self.current_building = None
 
         self.camera = Coords(CHARACTER_START[X], CHARACTER_START[Y])
+        self.camera_save = None
+
+        self.temp = []
 
     # @property
     # def background(self):
@@ -106,6 +111,10 @@ class Game:
     # @background.setter
     # def background(self, background):
     #     self._background = scale_surface(background)
+
+    @property
+    def in_building(self):
+        return self.current_building is not None
 
     def play(self):
         while self.running and not self.ended:
@@ -122,12 +131,16 @@ class Game:
         if self.ended:
             self.end()
 
+        if DEBUG:
+            print(self.temp)
+
     def handle_event(self):
         # checks if fading has end
         if self.fade_in and time.time() - begin_time > FADE_IN_TIME:
             self.fade_in = False
             self.countdown.start()
-            self.ambient.play()
+            if not DEBUG:
+                self.ambient.play()
 
         if self.fade_out and time.time() - self.fade_out_begin > FADE_OUT_TIME:
             # self.fade_out = False
@@ -141,9 +154,9 @@ class Game:
             self.running = False
 
         # checks if the countdown ends
-        if not self.fade_in and self.countdown.get() <= 0:
+        if not self.fade_in and not self.fade_out and self.countdown.get() <= 0:
             # can do stuff here idk
-            self.continue_game = False
+            self.begin_fade_out()
 
         if self.user_input.clicked_quit():
             self.running = False
@@ -153,20 +166,18 @@ class Game:
         self.screen.blit(self.background, (SCREEN_SIZE[X] // 2 - self.camera.x, SCREEN_SIZE[Y] // 2 - self.camera.y))
         # pygame.draw.rect(self.screen, color, self.character)
 
-        # updates all collectibles only when "F" is pressed
-        if self.user_input.clicked_interact(self.countdown.tick):
-            self.collectibles.update(self.character, self.camera)
+        if not self.in_building:
+            if DEBUG:
+                for building in self.buildings:
+                    building.debug_draw_position(self.screen, self.camera)
+                for win in self.wins:
+                    win.debug_draw(self.camera, self.screen)
 
-        # NOTE: TEMPORARY!!!
-        #for building in self.buildings:
-           # building.debug_draw_position(self.screen, self.camera)
+        else:
+            if DEBUG:
+                self.current_building.debug_draw_exit(self.screen, self.camera)
+            self.current_building.collectibles.draw(self.screen, self.camera)
 
-        # draws sprites
-        self.collectibles.draw(self.screen, self.camera)
-
-        # draws debug
-        for win in self.wins:
-            win.debug_draw(self.camera, self.screen)
 
         # draws countdown
         self.countdown.draw(self.screen, self.font, self.fade_in)
@@ -192,41 +203,67 @@ class Game:
 
         pygame.display.flip()
 
-
     def update(self):
         velocity = self.user_input.get_velocity()
         self.camera.store_previous()
         self.camera += velocity
+        if DEBUG:
+            coords = self.character.get_pixel_at_feet(self.camera)
+            print(coords)
+            if self.user_input.clicked_debug(self.countdown.tick):
+                self.temp.append(coords)
         self.character.update(velocity, self.countdown.tick)
 
-        # detects collision with walls and buildings
-        pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
-        if pixel[3] > ALPHA_THRESHOLD:
-            # TODO move back character
-            print("COLLIDES")
-            self.camera.x = self.camera.previous_x
-            self.camera.y = self.camera.previous_y
-        else:
-            print()
-
         if not self.in_building:
+            # detects collision with walls and buildings
+            pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
+            if pixel[3] > ALPHA_THRESHOLD:
+                # TODO make less sticky if possible
+                if not DEBUG:
+                    self.camera.x = self.camera.previous_x
+                    self.camera.y = self.camera.previous_y
+
             # checks for the building shit
             for building in self.buildings:
                 if building.enters(self.character, self.camera) and self.user_input.clicked_interact(self.countdown.tick):
-                    self.in_building = True
                     self.current_building = building
-                    self.background = self.current_building.background
+                    self.background = building.background
+                    self.camera_save = self.camera.copy()
+
+                    # resets the camera
+                    building_exit_coords = building.camera_exit_coords
+                    building_exit_coords.y -= self.character.rect.height // 2
+                    self.camera = building_exit_coords
 
                 # collides with any win
                 for win in self.wins:
-                    if win.collide(self.camera, self.character):
-                        self.continue_game = False
-                        self.fade_out = True
-                        self.fade_out_begin = time.time()
-                        self.countdown.stop()
+                    if win.collide(self.camera, self.character.get_rect_at_feet()):
+                        self.begin_fade_out()
+
         else:
+            # detects collision with the building walls by checking
+            # if the player leaves the given rect
+            coords = tuple(self.character.get_pixel_at_feet(self.camera))
+            if not self.current_building.walls.rect.collidepoint(coords):
+                # TODO make less sticky if possible
+                if not DEBUG:
+                    self.camera.x = self.camera.previous_x
+                    self.camera.y = self.camera.previous_y
+
+
             # checks whether they have left the building
-            pass
+            if (self.current_building.exit_area.collide(self.camera, self.character.get_rect_at_feet())
+                    and self.user_input.clicked_interact(self.countdown.tick)):
+                self.camera = self.camera_save
+                self.current_building = None
+                self.background = self.default_background
+                self.in_building_entrance = True
+
+    def begin_fade_out(self):
+        self.continue_game = False
+        self.fade_out = True
+        self.fade_out_begin = time.time()
+        self.countdown.stop()
 
     def end(self):
         pass

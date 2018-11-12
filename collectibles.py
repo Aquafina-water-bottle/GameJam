@@ -1,10 +1,13 @@
+import os
+
 import pygame
 
 from sprites import Sprite, SpriteGroup
 
 class Collectible(Sprite):
     def __init__(self, png_name, x, y, point_worth, weight):
-        super().__init__(png_name, x, y)
+        png_name = os.path.join("collectibles", png_name)
+        super().__init__(png_name, x, y, convert_alpha=True)
         self.point_worth = point_worth
         self.weight = weight
         self.picked_up = False
@@ -17,12 +20,5 @@ class Collectible(Sprite):
         if not self.picked_up:
             super().draw(screen, camera)
 
-def create_collectibles():
-    sprite_dict = {
-        "well": Collectible("well_bottom.png", 100, 100, 5, 5),
-    }
-
-    group = SpriteGroup(sprite_dict)
-    return group
 
 
