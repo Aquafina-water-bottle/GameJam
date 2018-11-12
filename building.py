@@ -72,7 +72,7 @@ def create_buildings():
             background_png_name="weaver_house.png",
             name="the weaver's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "scarf": Collectible("ugly_green_scarf.png", 44, 108, points=5, weight=1)
             }),
             furniture={
                 "thread_thing1": pygame.Rect(70, 65, 18, 23),
@@ -89,7 +89,7 @@ def create_buildings():
             background_png_name="your_house.png",
             name="your house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "gold": Collectible("pileogold.png", 39, 180, points=5, weight=1)
             }),
             furniture={
                 "bed": pygame.Rect(98, 65, 46, 66),
@@ -104,7 +104,9 @@ def create_buildings():
             background_png_name="other_house.png",
             name="TODO we probably should name this lol",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "sword": Collectible("sword.png", 37, 80, points=5, weight=1),
+                "bow and arrow": Collectible("bow_arrow.png", 130, 200, points=5, weight=1),
+                "daggers": Collectible("daggers.png", 100, 125, points=5, weight=1)
             }),
             furniture={
                 "bed": pygame.Rect(98, 58, 48, 97),
@@ -122,7 +124,8 @@ def create_buildings():
             background_png_name="baker_house.png",
             name="the baker's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "bread": Collectible("bread.png", 19, 118, points=5, weight=1),
+                "cheese": Collectible("cheese.png", 37, 118, points=5, weight=1)
             }),
             furniture={
                 "ovens": pygame.Rect(33, 45, 114, 33),
