@@ -15,10 +15,11 @@ class Building:
 
     note that entrance is relative to position
     """
-    def __init__(self, entrance, background_png_name, collectibles, furniture):
+    def __init__(self, entrance, background_png_name, name, collectibles, furniture):
         png_name = os.path.join("inside_houses", background_png_name)
         self.entrance = ScaledRect.from_rect(entrance)
         self.background = load_image(png_name, return_rect=False)
+        self.name = name
         self.collectibles = collectibles
         self.furniture = {k: ScaledRect.from_rect(v) for k, v in furniture.items()}
 
@@ -69,6 +70,7 @@ def create_buildings():
         "weaver_house": Building(
             entrance=pygame.Rect(323, 324, 20, 7),
             background_png_name="weaver_house.png",
+            name="the weaver's house",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
             }),
@@ -85,6 +87,7 @@ def create_buildings():
         "your_house": Building(
             entrance=pygame.Rect(518, 347, 20, 8),
             background_png_name="your_house.png",
+            name="your house",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
             }),
@@ -99,6 +102,7 @@ def create_buildings():
         "other_house": Building(
             entrance=pygame.Rect(629, 500, 23, 8),
             background_png_name="other_house.png",
+            name="TODO we probably should name this lol",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
             }),
@@ -116,6 +120,7 @@ def create_buildings():
         "baker_house": Building(
             entrance=pygame.Rect(449, 546, 22, 8),
             background_png_name="baker_house.png",
+            name="the baker's house",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
             }),
@@ -129,6 +134,7 @@ def create_buildings():
         "butcher_house": Building(
             entrance=pygame.Rect(307, 597, 20, 8),
             background_png_name="butcher_house.png",
+            name="the butcher's house",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
             }),

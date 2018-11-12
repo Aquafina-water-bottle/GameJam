@@ -120,6 +120,11 @@ class Character(Sprite):
         #self.has_key_a = False
         #self.has_key_b = False
 
+    def reset(self):
+        self.pose = Pose()
+        for key in self.items:
+            self.items[key] = 0
+
     @property
     def proper_size(self):
         """
@@ -204,7 +209,7 @@ class Character(Sprite):
 
     def has_no_items(self, *items):
         for item in items:
-            if self.character.items[item] != 0:
+            if self.items[item] != 0:
                 return False
         return True
 

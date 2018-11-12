@@ -29,7 +29,7 @@ class Countdown:
             self._tick += 1
 
     @property
-    def ends(self):
+    def ended(self):
         return self.get() <= 0
 
     @property
