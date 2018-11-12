@@ -5,7 +5,7 @@ class MainMenu:
     def __init__(self, screen, SCREEN_SIZE):
         self.screen = screen
         self.SCREEN_SIZE = SCREEN_SIZE
-        self.background = pygame.image.load(os.path.join('assets/BACKROUND.png'))
+        self.background = pygame.image.load(os.path.join('assets/background.png'))
         self.background = pygame.transform.scale(self.background, (SCREEN_SIZE))
         self.black_surface = self.screen.copy()
         self.black_surface.fill(pygame.Color("black"))
