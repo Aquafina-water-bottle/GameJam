@@ -19,15 +19,13 @@ class Collectible(Sprite):
         "filled_water_skin": "filled water skin",
     }
 
-    def __init__(self, png_name, x, y, points, weight, type=None):
+    def __init__(self, png_name, x, y, type=None):
         if type is None:
             self.type = png_name.split(".")[0]
         else:
             self.type = type
         png_name = os.path.join("collectibles", png_name)
         super().__init__(png_name, x, y, convert_alpha=True)
-        self.points = points
-        self.weight = weight
         self.picked_up = False
 
     def collides(self, character, camera):

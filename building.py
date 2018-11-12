@@ -72,7 +72,7 @@ def create_buildings():
             background_png_name="weaver_house.png",
             name="the weaver's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "water_skin1": Collectible("water_skin.png", 20, 150)
             }),
             furniture={
                 "thread_thing1": pygame.Rect(70, 65, 18, 23),
@@ -89,7 +89,7 @@ def create_buildings():
             background_png_name="your_house.png",
             name="your house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "water_skin1": Collectible("water_skin.png", 20, 150)
             }),
             furniture={
                 "bed": pygame.Rect(98, 65, 46, 66),
@@ -104,7 +104,7 @@ def create_buildings():
             background_png_name="other_house.png",
             name="TODO we probably should name this lol",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "water_skin1": Collectible("water_skin.png", 20, 150)
             }),
             furniture={
                 "bed": pygame.Rect(98, 58, 48, 97),
@@ -122,7 +122,7 @@ def create_buildings():
             background_png_name="baker_house.png",
             name="the baker's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "water_skin1": Collectible("water_skin.png", 20, 150)
             }),
             furniture={
                 "ovens": pygame.Rect(33, 45, 114, 33),
@@ -136,7 +136,7 @@ def create_buildings():
             background_png_name="butcher_house.png",
             name="the butcher's house",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+                "water_skin1": Collectible("water_skin.png", 20, 150)
             }),
             furniture={
                 "table1": pygame.Rect(17, 68, 36, 44),
