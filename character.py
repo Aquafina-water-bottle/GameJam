@@ -99,18 +99,18 @@ class Character(Sprite):
 
         # prerenders all images
         self.images = {
-            "standing-face-down-right": PoseImages("front.png", flip=True),
-            "standing-face-up-right": PoseImages("Back.png", flip=True),
-            "standing-face-down-left": PoseImages("front.png"),
-            "standing-face-up-left": PoseImages("Back.png"),
+            "standing-face-down-right": PoseImages("front.bmp", flip=True),
+            "standing-face-up-right": PoseImages("Back.bmp", flip=True),
+            "standing-face-down-left": PoseImages("front.bmp"),
+            "standing-face-up-left": PoseImages("Back.bmp"),
 
-            "moving-up-right": PoseImages("front-Lup.png", "front-Rup.png", flip=True),
-            "moving-up": PoseImages("front-for-Lup.png", "front-for-Rup.png"),
-            "moving-up-left": PoseImages("front-Lup.png", "front-Rup.png"),
+            "moving-up-right": PoseImages("front-Lup.bmp", "front-Rup.bmp", flip=True),
+            "moving-up": PoseImages("front-for-Lup.bmp", "front-for-Rup.bmp"),
+            "moving-up-left": PoseImages("front-Lup.bmp", "front-Rup.bmp"),
 
-            "moving-down-right": PoseImages("Back-Lup.png", "Back-Rup.png", flip=True),
-            "moving-down": PoseImages("Back-for-Lup.png", "Back-for-Rup.png"),
-            "moving-down-left": PoseImages("Back-Lup.png", "Back-Rup.png"),
+            "moving-down-right": PoseImages("Back-Lup.bmp", "Back-Rup.bmp", flip=True),
+            "moving-down": PoseImages("Back-for-Lup.bmp", "Back-for-Rup.bmp"),
+            "moving-down-left": PoseImages("Back-Lup.bmp", "Back-Rup.bmp"),
         }
 
         # for specific inventory items

@@ -28,12 +28,12 @@ class Button:
 
 class MainMenu:
     def __init__(self, screen):
-        self.background = load_image("START BACK.png", use_scale=False, return_rect=False)
+        self.background = load_image("main_menu.bmp", use_scale=False, return_rect=False)
         self.background = pygame.transform.scale(self.background, SCREEN_SIZE)
         self.black_surface = create_black_surface(screen)
         self.black_surface.set_alpha(100)
-        self.play_button = Button("StartButton.png", 0.3, 0.4, 0.4, 0.15, "orange")
-        self.exit_button = Button("QuitButton.png", 0.3, 0.57, 0.4, 0.15, "orange")
+        self.play_button = Button("StartButton.bmp", 0.3, 0.4, 0.4, 0.15, "orange")
+        self.exit_button = Button("QuitButton.bmp", 0.3, 0.57, 0.4, 0.15, "orange")
 
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
@@ -46,8 +46,8 @@ class PauseMenu:
     def __init__(self, screen):
         self.black_surface = create_black_surface(screen)
         self.black_surface.set_alpha(100)
-        self.resume_button = Button("Resumebutton.png", 0.3, 0.4, 0.4, 0.15, "orange")
-        self.exit_button = Button("QuitButton.png", 0.3, 0.57, 0.4, 0.15, "orange")
+        self.resume_button = Button("Resumebutton.bmp", 0.3, 0.4, 0.4, 0.15, "orange")
+        self.exit_button = Button("QuitButton.bmp", 0.3, 0.57, 0.4, 0.15, "orange")
 
     def draw(self, screen):
         screen.blit(self.black_surface, (0, 0))

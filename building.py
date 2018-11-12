@@ -69,11 +69,11 @@ def create_buildings():
     buildings_dict = {
         "weaver_house": Building(
             entrance=pygame.Rect(323, 324, 20, 7),
-            background_png_name="weaver_house.png",
+            background_png_name="weaver_house.bmp",
             name="the weaver's house",
             collectibles=SpriteGroup({
-                "bandages": Collectible("bandages.png", 37, 198),
-                "scarf": Collectible("ugly_green_scarf.png", 44, 108),
+                "bandages": Collectible("bandages.bmp", 37, 198),
+                "scarf": Collectible("ugly_green_scarf.bmp", 44, 108),
             }),
             furniture={
                 "thread_thing1": pygame.Rect(70, 65, 18, 23),
@@ -87,10 +87,10 @@ def create_buildings():
 
         "your_house": Building(
             entrance=pygame.Rect(518, 347, 20, 8),
-            background_png_name="your_house.png",
+            background_png_name="your_house.bmp",
             name="your house",
             collectibles=SpriteGroup({
-                "gold": Collectible("pileogold.png", 39, 180)
+                "gold": Collectible("pileogold.bmp", 39, 180)
             }),
             furniture={
                 "bed": pygame.Rect(98, 65, 46, 66),
@@ -102,12 +102,12 @@ def create_buildings():
 
         "other_house": Building(
             entrance=pygame.Rect(629, 500, 23, 8),
-            background_png_name="other_house.png",
+            background_png_name="other_house.bmp",
             name="the neighbour's house",
             collectibles=SpriteGroup({
-                "sword": Collectible("sword.png", 37, 80),
-                "bow and arrow": Collectible("bow_arrow.png", 130, 200),
-                "daggers": Collectible("daggers.png", 100, 125),
+                "sword": Collectible("sword.bmp", 37, 80),
+                "bow and arrow": Collectible("bow_arrow.bmp", 130, 200),
+                "daggers": Collectible("daggers.bmp", 100, 125),
             }),
             furniture={
                 "bed": pygame.Rect(98, 58, 48, 97),
@@ -122,11 +122,11 @@ def create_buildings():
 
         "baker_house": Building(
             entrance=pygame.Rect(449, 546, 22, 8),
-            background_png_name="baker_house.png",
+            background_png_name="baker_house.bmp",
             name="the baker's house",
             collectibles=SpriteGroup({
-                "bread": Collectible("bread.png", 19, 118),
-                "cheese": Collectible("cheese.png", 37, 118),
+                "bread": Collectible("bread.bmp", 19, 118),
+                "cheese": Collectible("cheese.bmp", 37, 118),
             }),
             furniture={
                 "ovens": pygame.Rect(33, 45, 114, 33),
@@ -137,11 +137,11 @@ def create_buildings():
 
         "butcher_house": Building(
             entrance=pygame.Rect(307, 597, 20, 8),
-            background_png_name="butcher_house.png",
+            background_png_name="butcher_house.bmp",
             name="the butcher's house",
             collectibles=SpriteGroup({
-                "water_skin": Collectible("water_skin.png", 38, 84),
-                "jerky": Collectible("jerky.png", 19, 203),
+                "water_skin": Collectible("water_skin.bmp", 38, 84),
+                "jerky": Collectible("jerky.bmp", 19, 203),
             }),
             furniture={
                 "table1": pygame.Rect(17, 68, 36, 44),

@@ -30,7 +30,7 @@ class Game:
         # initialize the pygame module
         pygame.init()
 
-        logo_name = os.path.join('assets', "logo.png")
+        logo_name = os.path.join('assets', "logo.bmp")
         logo  = pygame.image.load(logo_name)
         pygame.display.set_icon(logo)
 
@@ -45,7 +45,7 @@ class Game:
         self.notification_font = pygame.font.Font(None, 25)
 
         # specifies the middle of the screen
-        self.character = Character("avatar/MC-front.png", 0, 0)
+        self.character = Character("avatar/MC-front.bmp", 0, 0)
         self.camera = Coords(CHARACTER_START[X], CHARACTER_START[Y])
 
         # saves the camera for when enering the building
@@ -86,11 +86,11 @@ class Game:
         # self.show_ending = False
 
         self.end_image = None
-        self.begin_image = load_image("beginlol.png", use_scale=False, return_rect=False)
+        self.begin_image = load_image("beginlol.bmp", use_scale=False, return_rect=False)
         self.begin_image = pygame.transform.scale(self.begin_image, SCREEN_SIZE)
 
-        self.default_background = load_image('background.png', return_rect=False)
-        self.building_wall_mask = load_image('background_outline.png', convert_alpha=True, return_rect=False)
+        self.default_background = load_image('background.bmp', return_rect=False)
+        self.building_wall_mask = load_image('background_outline.bmp', convert_alpha=True, return_rect=False)
 
         # background can change to default background or house background
         self.background = self.default_background
@@ -487,21 +487,21 @@ class Game:
 
         # gets the end image
         if not self.character.escaped:
-            self.end_image = load_image("endings/stay_death.png", return_rect=False)
+            self.end_image = load_image("endings/stay_death.bmp", return_rect=False)
         elif sum(self.character.items.values()) <= 2:
-            self.end_image = load_image("endings/missing_lots_death.png", return_rect=False)
+            self.end_image = load_image("endings/missing_lots_death.bmp", return_rect=False)
         elif self.character.has_no_items("filled_water_skin"):
-            self.end_image = load_image("endings/thirst_death.png", return_rect=False)
+            self.end_image = load_image("endings/thirst_death.bmp", return_rect=False)
         elif self.character.has_no_items("ugly_green_scarf"):
-            self.end_image = load_image("endings/cold_death.png", return_rect=False)
+            self.end_image = load_image("endings/cold_death.bmp", return_rect=False)
         elif self.character.has_no_items("bread", "cheese", "jerky"):
-            self.end_image = load_image("endings/starvation_death.png", return_rect=False)
+            self.end_image = load_image("endings/starvation_death.bmp", return_rect=False)
         elif self.character.has_no_items("bandages", "bow_arrow", "cheese"):
-            self.end_image = load_image("endings/bandits_death.png", return_rect=False)
+            self.end_image = load_image("endings/bandits_death.bmp", return_rect=False)
         elif self.character.has_no_items("pileogold"):
-            self.end_image = load_image("endings/no_money_death.png", return_rect=False)
+            self.end_image = load_image("endings/no_money_death.bmp", return_rect=False)
         else:
-            self.end_image = load_image("endings/win_happy.png", return_rect=False)
+            self.end_image = load_image("endings/win_happy.bmp", return_rect=False)
 
         self.end_image = pygame.transform.scale(self.end_image, SCREEN_SIZE)
 
