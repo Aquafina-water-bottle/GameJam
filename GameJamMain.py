@@ -1,4 +1,5 @@
-# import the pygame module, so you can use it
+import os
+
 import pygame
 
 from constants import *
@@ -29,7 +30,11 @@ class Game:
         # initialize the pygame module
         pygame.init()
 
-        pygame.display.set_caption("Escape The Village")
+        logo_name = os.path.join('assets', "logo.png")
+        logo  = pygame.image.load(logo_name)
+        pygame.display.set_icon(logo)
+
+        pygame.display.set_caption("Escape")
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
         self.black_surface = self.screen.copy()
         self.black_surface.fill(pygame.Color("black"))
