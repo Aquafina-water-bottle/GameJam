@@ -45,20 +45,19 @@ def main():
         # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)entrance
     screen = pygame.display.set_mode(SCREEN_SIZE)
     mainMenu = MainMenu(screen, SCREEN_SIZE)
-    game = Game(screen)
     while loop:
         mainMenu = MainMenu(screen, SCREEN_SIZE)
-        game = Game(screen)
+        game = Game(screen, loop)
         if mainMenu.play():
-            game.play()
+            loop = game.play()
         else:
             loop = False
 
 class Game:
-    def __init__(self, screen):
+    def __init__(self, screen, loop):
         # initialize the pygame module
         self.screen = screen
-
+        self.loop = loop
         self.font = pygame.font.Font(None, 100)
 
         # define a variable to control the main loop
@@ -132,7 +131,7 @@ class Game:
         self.begin_time = time.time()
         self.ended = False
         self.fade_in = True
-
+        self.beginning()
         while self.running and not self.ended:
             self.user_input.update()
             self.countdown.update()
@@ -145,11 +144,13 @@ class Game:
             while self.paused:
                 self.pause()
             self.clock.tick(60)
+        return self.loop
 
         if DEBUG:
             print("debug: temp =", self.temp)
 
-        print("collected {}".format(self.character.items))
+            print("collected {}".format(self.character.items))
+
 
     def handle_event(self):
         # checks if fading has end
@@ -170,6 +171,7 @@ class Game:
         if event.type == pygame.QUIT:
             # change the value to False, to exit the main loop
             self.running = False
+            self.loop = False
 
         # checks if the countdown ends
         if not self.fade_in and not self.fade_out and self.countdown.get() <= 0:
@@ -182,6 +184,9 @@ class Game:
         if self.user_input.clicked_pause():
             self.countdown.pause()
             self.paused = True
+
+    def beginning(self):
+        self.screen.fill((0, 0, 0))
 
 
     def draw(self):
@@ -314,6 +319,7 @@ class Game:
         self.countdown.stop()
 
     def pause(self):
+        self.user_input.update()
         self.draw()
         black_surface = self.screen.copy()
         black_surface.fill(pygame.Color("black"))
@@ -360,6 +366,13 @@ class Game:
                 self.ended = True
                 self.paused = False
 
+        if event.type == pygame.QUIT:
+            # change the value to False, to exit the main loop
+            self.running = False
+            self.loop = False
+            self.paused = False
+        if self.user_input.pause():
+            self.paused = False
 
 
 # run the main function only if this module is executed as the main script
