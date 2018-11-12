@@ -1,8 +1,9 @@
 # import the pygame module, so you can use it
 import os
 import time
-
 import pygame
+
+from MainMenu import MainMenu
 from win import Win
 from constants import *
 from countdown import Countdown
@@ -37,20 +38,24 @@ TODO (programming):
 """
 
 def main():
-    game = Game()
-    game.play()
-
-
-class Game:
-    def __init__(self):
-        # initialize the pygame module
-        pygame.init()
-        self.font = pygame.font.Font(None, 100)
-        pygame.display.set_caption("Escape The Village")
+    pygame.init()
+    pygame.display.set_caption("Escape The Village")
 
         # create a surface on screen that has the size of 240 x 180144
         # screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)entrance
-        self.screen = pygame.display.set_mode(SCREEN_SIZE)
+    screen = pygame.display.set_mode(SCREEN_SIZE)
+    mainMenu = MainMenu(screen, SCREEN_SIZE)
+    game = Game(screen)
+    if mainMenu.play():
+        game.play()
+
+
+class Game:
+    def __init__(self, screen):
+        # initialize the pygame module
+        self.screen = screen
+
+        self.font = pygame.font.Font(None, 100)
 
         # define a variable to control the main loop
         self.running = True
@@ -98,6 +103,7 @@ class Game:
         self.current_building = None
 
         self.camera = Coords(CHARACTER_START[X], CHARACTER_START[Y])
+        self.score = 0
 
     # @property
     # def background(self):
@@ -203,11 +209,8 @@ class Game:
         pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
         if pixel[3] > ALPHA_THRESHOLD:
             # TODO move back character
-            print("COLLIDES")
             self.camera.x = self.camera.previous_x
             self.camera.y = self.camera.previous_y
-        else:
-            print()
 
         if not self.in_building:
             # checks for the building shit

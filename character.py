@@ -9,7 +9,6 @@ class Pose:
         # not sure of a good name for this
         # animation_index = 0 or 1 for walking left or right respectively
         self.standing = False
-
         # -1 = facing left
         # 0 = not facing left or right
         # 1 = facing right
@@ -141,20 +140,24 @@ class Character(Sprite):
             self.pose.standing = True
             self.pose.animation_index = 0
             self.update_walk_pose()
+            return False
 
         # otherwise, it just replaces the entire pose if they both differ completely
-        elif not pose.standing and pose != self.pose:
+        if not pose.standing and pose != self.pose:
             self.pose = pose
             self.update_walk_pose()
+            return True
 
         # updates the animation tick when moving
-        elif not self.pose.standing and tick % RUNNING_ANIMATION_DELAY == 0:
+        if not self.pose.standing and tick % RUNNING_ANIMATION_DELAY == 0:
             # checks if the pose is directly moving up and down and not left and right
             if self.pose.facing_not_right_left:
                 self.pose.increment(2)
             else:
                 self.pose.increment(2)
             self.update_walk_pose()
+            return True
+        return False
 
     def update_walk_pose(self):
         if self.pose.standing:
