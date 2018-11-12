@@ -177,7 +177,7 @@ class Game:
 
         else:
             if DEBUG:
-                self.current_building.debug_draw_exit(self.screen, self.camera)
+                self.current_building.debug_draw_inner(self.screen, self.camera)
 
             self.current_building.collectibles.draw(self.screen, self.camera)
             for collectible in self.current_building.collectibles:
@@ -193,6 +193,8 @@ class Game:
 
         # draws character at the last lmao
         self.character.draw(self.screen)
+        if DEBUG:
+            self.character.draw_pixel(self.screen, self.camera)
 
         if self.fade_in:
             # where alpha_value decreases from 255 to 0
@@ -228,7 +230,7 @@ class Game:
             pixel = (self.building_wall_mask.get_at(tuple(self.character.get_pixel_at_feet(self.camera))))
             if pixel[3] > ALPHA_THRESHOLD:
                 # TODO make less sticky if possible
-                if not DEBUG:
+                if COLLIDES:
                     self.camera.x = self.camera.previous_x
                     self.camera.y = self.camera.previous_y
 
@@ -255,10 +257,17 @@ class Game:
             coords = tuple(self.character.get_pixel_at_feet(self.camera))
             if not self.current_building.walls.rect.collidepoint(coords):
                 # TODO make less sticky if possible
-                if not DEBUG:
+                if COLLIDES:
                     self.camera.x = self.camera.previous_x
                     self.camera.y = self.camera.previous_y
 
+            # detects collision for furinture
+            for furniture in self.current_building.furniture.values():
+                if furniture.rect.collidepoint(coords):
+                    # TODO make less sticky if possible
+                    if COLLIDES:
+                        self.camera.x = self.camera.previous_x
+                        self.camera.y = self.camera.previous_y
 
             # checks whether they have left the building
             if (self.current_building.exit_area.collide(self.camera, self.character.get_rect_at_feet())

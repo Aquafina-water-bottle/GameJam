@@ -15,11 +15,12 @@ class Building:
 
     note that entrance is relative to position
     """
-    def __init__(self, entrance, background_png_name, collectibles):
+    def __init__(self, entrance, background_png_name, collectibles, furniture):
         png_name = os.path.join("inside_houses", background_png_name)
         self.entrance = ScaledRect.from_rect(entrance)
         self.background = load_image(png_name, return_rect=False)
         self.collectibles = collectibles
+        self.furniture = {k: ScaledRect.from_rect(v) for k, v in furniture.items()}
 
         exit_x = 59
         exit_y = self.background.get_height()//SCALE - 25
@@ -49,9 +50,13 @@ class Building:
         relative_position = get_relative(self.entrance.rect, camera)
         pygame.draw.rect(screen, pygame.Color("orange"), relative_position)
 
-    def debug_draw_exit(self, screen, camera):
-        relative_position = get_relative(self.walls.rect, camera)
-        pygame.draw.rect(screen, pygame.Color("red"), relative_position)
+    def debug_draw_inner(self, screen, camera):
+        # relative_position = get_relative(self.walls.rect, camera)
+        # pygame.draw.rect(screen, pygame.Color("red"), relative_position)
+
+        for furniture in self.furniture.values():
+            relative_position = get_relative(furniture.rect, camera)
+            pygame.draw.rect(screen, pygame.Color("green"), relative_position)
 
         relative_position = get_relative(self.exit_area.rect, camera)
         pygame.draw.rect(screen, pygame.Color("orange"), relative_position)
@@ -62,43 +67,78 @@ def create_buildings():
     """
     buildings_dict = {
         "weaver_house": Building(
-            entrance=pygame.Rect(323, 325, 20, 5),
+            entrance=pygame.Rect(323, 324, 20, 7),
             background_png_name="weaver_house.png",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
-            })
+            }),
+            furniture={
+                "thread_thing1": pygame.Rect(70, 65, 18, 23),
+                "thread_thing2": pygame.Rect(98, 65, 21, 23),
+                "thread_thing3": pygame.Rect(122, 203, 20, 24),
+                "barrel": pygame.Rect(123, 56, 23, 30),
+                "table": pygame.Rect(17, 179, 37, 45),
+                "bed": pygame.Rect(14, 67, 44, 60),
+            }
         ),
 
         "your_house": Building(
-            entrance=pygame.Rect(518, 349, 20, 8),
+            entrance=pygame.Rect(518, 347, 20, 8),
             background_png_name="your_house.png",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
-            })
+            }),
+            furniture={
+                "bed": pygame.Rect(98, 65, 46, 66),
+                "table": pygame.Rect(16, 179, 40, 46),
+                "dresser": pygame.Rect(14, 58, 47, 27),
+                "bedside_table": pygame.Rect(72, 56, 20, 29),
+            }
         ),
 
         "other_house": Building(
-            entrance=pygame.Rect(629, 501, 23, 8),
+            entrance=pygame.Rect(629, 500, 23, 8),
             background_png_name="other_house.png",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
-            })
+            }),
+            furniture={
+                "bed": pygame.Rect(98, 58, 48, 97),
+                "table": pygame.Rect(14, 62, 37, 45),
+                "barrel1": pygame.Rect(15, 173, 21, 26),
+                "barrel2": pygame.Rect(14, 204, 23, 28),
+                "barrel3": pygame.Rect(41, 205, 23, 27),
+                "barrel4": pygame.Rect(126, 203, 21, 29),
+
+            }
         ),
 
         "baker_house": Building(
-            entrance=pygame.Rect(449, 547, 22, 8),
+            entrance=pygame.Rect(449, 546, 22, 8),
             background_png_name="baker_house.png",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
-            })
+            }),
+            furniture={
+                "ovens": pygame.Rect(33, 45, 114, 33),
+                "dresser": pygame.Rect(16, 124, 98, 29),
+                "barrels": pygame.Rect(125, 205, 23, 26),
+            }
         ),
 
         "butcher_house": Building(
-            entrance=pygame.Rect(307, 598, 20, 8),
+            entrance=pygame.Rect(307, 597, 20, 8),
             background_png_name="butcher_house.png",
             collectibles=SpriteGroup({
                 "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
-            })
+            }),
+            furniture={
+                "table1": pygame.Rect(17, 68, 36, 44),
+                "table2": pygame.Rect(104, 68, 36, 41),
+                "dressers": pygame.Rect(17, 150, 96, 26),
+                "small_table": pygame.Rect(15, 203, 19, 28),
+
+            }
         ),
 
     }
