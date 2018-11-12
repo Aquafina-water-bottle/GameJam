@@ -84,7 +84,7 @@ class Game:
         #self.fade_in = False; self.countdown.start()  # because annoying
 
         # temporarily transforms the background to the current resolution
-        self.default_background = load_image('BACKROUND.png', return_rect=False)
+        self.default_background = load_image('background.png', return_rect=False)
 
         self.building_wall_mask = load_image('background_outline.png', convert_alpha=True, return_rect=False)
         # self.building_wall_mask = pygame.mask.from_surface(walls)
@@ -132,7 +132,9 @@ class Game:
             self.end()
 
         if DEBUG:
-            print(self.temp)
+            print("debug: temp =", self.temp)
+
+        print("collected {}".format(self.character.items))
 
     def handle_event(self):
         # checks if fading has end
@@ -176,7 +178,14 @@ class Game:
         else:
             if DEBUG:
                 self.current_building.debug_draw_exit(self.screen, self.camera)
+
             self.current_building.collectibles.draw(self.screen, self.camera)
+            for collectible in self.current_building.collectibles:
+                if self.character.proper_size.colliderect(collectible.get_relative(self.camera)) and self.user_input.clicked_interact(self.countdown.tick):
+                    collectible.picked_up = True
+                    self.character.items[collectible.type] += 1
+                    self.character.points += collectible.points
+                    self.character.weight += collectible.weight
 
 
         # draws countdown

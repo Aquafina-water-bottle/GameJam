@@ -59,16 +59,48 @@ class Building:
 
 def create_buildings():
     """
-    964,990
     """
     buildings_dict = {
         "weaver_house": Building(
             entrance=pygame.Rect(323, 325, 20, 5),
             background_png_name="weaver_house.png",
             collectibles=SpriteGroup({
-                "water_skin1": Collectible("water_skin.png", 20, 50, point_worth=5, weight=1)
+                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
             })
         ),
+
+        "your_house": Building(
+            entrance=pygame.Rect(518, 349, 20, 8),
+            background_png_name="your_house.png",
+            collectibles=SpriteGroup({
+                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+            })
+        ),
+
+        "other_house": Building(
+            entrance=pygame.Rect(629, 501, 23, 8),
+            background_png_name="other_house.png",
+            collectibles=SpriteGroup({
+                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+            })
+        ),
+
+        "baker_house": Building(
+            entrance=pygame.Rect(449, 547, 22, 8),
+            background_png_name="baker_house.png",
+            collectibles=SpriteGroup({
+                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+            })
+        ),
+
+        "butcher_house": Building(
+            entrance=pygame.Rect(307, 598, 20, 8),
+            background_png_name="butcher_house.png",
+            collectibles=SpriteGroup({
+                "water_skin1": Collectible("water_skin.png", 20, 150, points=5, weight=1)
+            })
+        ),
+
     }
     group = SpriteGroup(buildings_dict)
     return group

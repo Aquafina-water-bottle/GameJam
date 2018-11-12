@@ -1,7 +1,7 @@
 import pygame
 
 from sprites import Sprite
-from general import load_image, get_relative, Coords
+from general import load_image, scale_rect, Coords
 from constants import *
 
 class Pose:
@@ -72,7 +72,19 @@ class Character(Sprite):
     def __init__(self, png_name, x, y):
         super().__init__(png_name, x, y, convert_alpha=True)
         self.weight = 0
-        self.points_collected = 0
+        self.points = 0
+        self.items = {
+            "bandages": 0,
+            "bow_arrow": 0,
+            "bread": 0,
+            "cheese": 0,
+            "daggers": 0,
+            "jerky": 0,
+            "pileogold": 0,
+            "sword": 0,
+            "ugly_green_scarf": 0,
+            "water_skin": 0,
+        }
 
         self.in_building_entrance = False
         self.in_building_exit = False
@@ -104,6 +116,17 @@ class Character(Sprite):
         #self.has_water_skin = False
         #self.has_key_a = False
         #self.has_key_b = False
+
+    @property
+    def proper_size(self):
+        """
+        removes 5 pixels from the sides
+        """
+        x = self.rect.x // SCALE + 6
+        y = self.rect.y // SCALE
+        width = self.rect.width // SCALE - 6*2
+        height = self.rect.height // SCALE
+        return scale_rect(pygame.Rect(x, y, width, height))
 
     def update(self, velocity, tick):
         pose = Pose()
@@ -196,4 +219,3 @@ class Character(Sprite):
 
     def move_back():
         pass
-
