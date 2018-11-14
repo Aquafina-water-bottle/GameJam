@@ -71,6 +71,7 @@ class Game:
         self.current_building = None
         self.buildings = create_buildings()
         self.well_area = ScaledRect(208, 354, 60, 51)
+        self.grave_area = ScaledRect(371, 553, 41, 35)
 
         # define a variable to control the main loop
         # where it is really only set to false if the player exits or the X button is pressed
@@ -258,8 +259,15 @@ class Game:
                         if not pixel[3] > ALPHA_THRESHOLD:
                             self.camera.x = coords.x
 
+                # checks for paying respects to the grave
+                if self.grave_area.collide(self.camera, self.character.proper_size):
+                    self.subtext_value = "Press {} to pay respects".format(INTERACT_KEY)
+                    if self.user_input.clicked_interact(self.ticker.tick):
+                        self.notification_value = "Paid respects"
+                        self.notification_timer.start(NOTIFICATION_TIME)
+
                 # checks for collecting water at the well
-                if (self.well_area.collide(self.camera, self.character.proper_size) and self.character.items["water_skin"] >= 1):
+                if self.well_area.collide(self.camera, self.character.proper_size) and self.character.items["water_skin"] >= 1:
                     self.subtext_value = "Press {} to fill your water skin".format(INTERACT_KEY)
                     if self.user_input.clicked_interact(self.ticker.tick):
                         self.character.items["water_skin"] -= 1
